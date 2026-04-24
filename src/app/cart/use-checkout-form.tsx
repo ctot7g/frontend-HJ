@@ -459,6 +459,7 @@ export function useCheckoutForm() {
     formData,
     setFormData,
     currentStep,
+    setCurrentStep,
     handleNext,
     handlePlaceOrder,
     showGuestOptions,

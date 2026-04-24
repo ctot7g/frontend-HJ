@@ -277,14 +277,16 @@ export function useUserOrders(params?: OrdersListParams) {
   return useQuery({
     queryKey: ["user-orders", params],
     queryFn: () => getUserOrders(params),
-    staleTime: 0, // Always consider data stale to fetch fresh data
-    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes (renamed from cacheTime)
-    enabled: typeof window !== "undefined", // Only run in browser
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
+    // REMOVED: enabled: typeof window !== 'undefined'
+    // Reason: causes SSR/client hydration mismatch. React Query only
+    // executes queryFn in the browser already — this flag is not needed.
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnReconnect: true, // Refetch when reconnecting
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 

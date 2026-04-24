@@ -162,14 +162,6 @@ export function Navbar() {
   ];
 
   const fabrics = [
-    // {
-    //   label: "Premium Fabric",
-    //   url: `products/?material=${encodeURIComponent("premium fabric")}`,
-    // },
-    // {
-    //   label: "High-quality fabric",
-    //   url: `products/?material=${encodeURIComponent("high-quality fabric")}`,
-    // },
     {
       label: "Fabric Sofas",
       url: `products/?material=${encodeURIComponent("fabric sofas")}`,
@@ -178,10 +170,6 @@ export function Navbar() {
       label: "Leather Sofas",
       url: `products/?material=${encodeURIComponent("leather sofas")}`,
     },
-    // {
-    //   label: "Velvet Sofas",
-    //   url: `products/?material=${encodeURIComponent("velvet sofas")}`,
-    // },
   ];
 
   const handleLoginClick = () => {
@@ -339,7 +327,7 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* ── All Products dropdown (replaces plain link) ── */}
+              {/* ── All Products dropdown ── */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -549,12 +537,21 @@ export function Navbar() {
                         My Account
                       </Link>
                     </DropdownMenuItem>
+                    {/* Orders section with sub-items */}
                     <DropdownMenuItem asChild>
                       <Link
                         href="/orders"
                         className="font-open-sans w-full cursor-pointer"
                       >
                         My Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/trackorder"
+                        className="font-open-sans w-full cursor-pointer"
+                      >
+                        Track Order
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -842,7 +839,6 @@ export function Navbar() {
                       >
                         All Products
                       </Link>
-                      {/* ── All Bundles link (mobile) ── */}
                       <Link
                         href="/bundles"
                         className="font-open-sans flex items-center gap-2 text-base font-medium"
@@ -897,6 +893,14 @@ export function Navbar() {
                           >
                             My Orders
                           </Link>
+                          {/* Track Order - indented under My Orders */}
+                          <Link
+                            href="/trackorder"
+                            className="font-open-sans flex items-center text-base"
+                            onClick={() => setIsSheetOpen(false)}
+                          >
+                            Track Order
+                          </Link>
                           <Link
                             href="/wishlist"
                             className="font-open-sans flex items-center text-base font-medium"
@@ -942,7 +946,6 @@ export function Navbar() {
                           <Link
                             href="/login"
                             className="font-open-sans flex items-center text-base font-medium"
-                            // onClick={() => setIsSheetOpen(false)}
                             onClick={() => {
                               setIsSheetOpen(false);
                               handleLoginClick();
@@ -1017,7 +1020,6 @@ export function Navbar() {
 
             {/* Right - Cart Icon (Large) */}
             <div className="flex items-center">
-              {/* Cart Icon (Large) */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -1026,14 +1028,6 @@ export function Navbar() {
               >
                 <Link href="/cart">
                   <ShoppingCart className="!h-10 !w-10 text-black" size={100} />
-
-                  {/* <Image
-                    src="/n-3.png"
-                    alt="Cart"
-                    width={28}
-                    height={28}
-                    className="no-style object-contain"
-                  /> */}
                   {isClient && totalItems > 0 && (
                     <Badge
                       className={`bg-blue absolute -top-1 -right-1 flex items-center justify-center rounded-full text-xs text-white hover:bg-blue-700 ${

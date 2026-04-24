@@ -3,7 +3,7 @@
 import { useCart } from "@/lib/store/cart-store";
 import { useAuth } from "@/lib/providers/auth-provider";
 import React, { useState, useEffect } from "react";
-
+import { useSearchParams } from "next/navigation";
 import { OrderCompleteTab } from "./_components/order-complete-tab";
 import { CheckoutDetailsTab } from "./_components/checkout-details-tab";
 import { CartSteps } from "./_components/cart-steps";
@@ -22,8 +22,18 @@ export default function CartPage() {
   const { user, loading: authLoading } = useAuth();
   const { totalItems, error: cartError } = useCart();
 
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const step = searchParams.get("step");
+    if (step === "3") {
+      setCurrentStep(3);
+    }
+  }, [searchParams]);
+
   const {
     currentStep,
+    setCurrentStep,
     orderData,
     showGuestOptions,
     handleContinueAsGuest,

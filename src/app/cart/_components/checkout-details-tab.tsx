@@ -15,7 +15,8 @@ import { FormInputWithLabel, FormSelectWithLabel } from "./checkout-form-inputs"
 import React, { useEffect } from "react";
 import { useAuth } from "@/lib/providers/auth-provider";
 import { useDeliveryChargesByZipCode } from "@/hooks/use-zones";
-import { X, Wallet } from "lucide-react";
+import { X, Wallet, CreditCard, CalendarDays, ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CheckoutDetailsTabProps {
   onNext: () => void;
@@ -40,6 +41,72 @@ interface CheckoutDetailsTabProps {
   setUseWallet: (val: boolean) => void;
 }
 
+// ─── Payment Method Selection Overlay ────────────────────────────────────────
+interface PaymentMethodStepProps {
+  grandTotal: number;
+  onPayWithCard: () => void;
+  onPayInInstallments: () => void;
+  onBack: () => void;
+}
+
+const PaymentMethodStep = ({
+  grandTotal,
+  onPayWithCard,
+  onPayInInstallments,
+  onBack,
+}: PaymentMethodStepProps) => (
+  <div className="mt-6 flex flex-col items-center gap-6">
+    <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+      <div className="mb-5 text-center">
+        <p className="text-xs uppercase tracking-widest text-gray-400">Order Total</p>
+        <p className="mt-1 text-4xl font-bold text-gray-900">£{grandTotal.toFixed(2)}</p>
+      </div>
+
+      <p className="mb-4 text-center text-sm font-medium text-gray-500">
+        How would you like to pay?
+      </p>
+
+      {/* Pay with Card */}
+      <button
+        onClick={onPayWithCard}
+        className="group mb-3 flex w-full items-center gap-4 rounded-xl border-2 border-blue-600 bg-blue-600 px-5 py-4 text-left transition-all hover:bg-blue-700 active:scale-[0.98]"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20">
+          <CreditCard size={20} className="text-white" />
+        </div>
+        <div>
+          <p className="font-semibold text-white">Pay with Card</p>
+          <p className="text-xs text-blue-100">Secure payment via Worldpay</p>
+        </div>
+      </button>
+
+      {/* Pay in Installments */}
+      <button
+        onClick={onPayInInstallments}
+        className="group flex w-full items-center gap-4 rounded-xl border-2 border-gray-200 bg-white px-5 py-4 text-left transition-all hover:border-purple-400 hover:bg-purple-50 active:scale-[0.98]"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100">
+          <CalendarDays size={20} className="text-purple-700" />
+        </div>
+        <div>
+          <p className="font-semibold text-gray-800">Pay in Installments</p>
+          <p className="text-xs text-gray-500">0% APR · Up to 48 months interest free</p>
+        </div>
+      </button>
+
+      {/* Back */}
+      <button
+        onClick={onBack}
+        className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
+      >
+        <ChevronLeft size={14} />
+        Back to details
+      </button>
+    </div>
+  </div>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export const CheckoutDetailsTab = ({
   onNext,
   formData,
@@ -55,6 +122,8 @@ export const CheckoutDetailsTab = ({
 }: CheckoutDetailsTabProps) => {
   const { user } = useAuth();
   const { assemblyTotal, subtotal, getCartTotal } = useCart();
+  const router = useRouter();
+
   const {
     couponCode, setCouponCode, appliedCoupon, discountAmount,
     isApplyingCoupon, couponError, applyCoupon, removeCoupon,
@@ -62,6 +131,10 @@ export const CheckoutDetailsTab = ({
 
   const [showGuestOptions, setShowGuestOptions] = React.useState(!user && !formData.isGuest);
   const [localCouponCode, setLocalCouponCode] = React.useState("");
+
+  // NEW: tracks whether we're showing payment method choice
+  const [showPaymentChoice, setShowPaymentChoice] = React.useState(false);
+
   const floorsQuery = useFloors();
   const deliveryChargesByZipCode = useDeliveryChargesByZipCode();
 
@@ -100,6 +173,29 @@ export const CheckoutDetailsTab = ({
     0,
     subtotalWithCharges - discountAmount - referralDiscount - walletDiscount
   );
+
+  // ── "Place Order" clicked → show payment method picker ──────────────────────
+  const handlePlaceOrderClick = () => {
+    setShowPaymentChoice(true);
+  };
+
+  // ── "Pay with Card" → proceed to Worldpay (existing onNext flow) ─────────────
+  const handlePayWithCard = () => {
+    setShowPaymentChoice(false);
+    onNext(); // existing handler that triggers Worldpay
+  };
+
+  // ── "Pay in Installments" → navigate to installments page ───────────────────
+  const handlePayInInstallments = () => {
+    // Pass grand total + order meta via query params (or you can use session/store)
+    const params = new URLSearchParams({
+      total: grandTotal.toFixed(2),
+      floor: floorCharge.toFixed(2),
+      shipping: zonalCharges.toFixed(2),
+      discount: discountAmount.toFixed(2),
+    });
+    router.push(`/installments?${params.toString()}`);
+  };
 
   return (
     <div className="px-0.5 md:px-8">
@@ -190,12 +286,28 @@ export const CheckoutDetailsTab = ({
               </div>
             </div>
 
-            <div className="flex gap-4 text-center">
-              <Button onClick={onNext} disabled={isProcessing} variant="primary" size="xl" rounded="full"
-                className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
-                {isProcessing ? "Processing Payment..." : "Place Order"}
-              </Button>
-            </div>
+            {/* ── Payment Method Step (replaces button when clicked) ── */}
+            {showPaymentChoice ? (
+              <PaymentMethodStep
+                grandTotal={grandTotal}
+                onPayWithCard={handlePayWithCard}
+                onPayInInstallments={handlePayInInstallments}
+                onBack={() => setShowPaymentChoice(false)}
+              />
+            ) : (
+              <div className="flex gap-4 text-center">
+                <Button
+                  onClick={handlePlaceOrderClick}
+                  disabled={isProcessing}
+                  variant="primary"
+                  size="xl"
+                  rounded="full"
+                  className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isProcessing ? "Processing Payment..." : "Place Order"}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -246,7 +358,7 @@ export const CheckoutDetailsTab = ({
                 )}
               </div>
 
-              {/* ✅ Wallet Checkbox */}
+              {/* Wallet Checkbox */}
               {walletBalance > 0 && (
                 <div className="mb-4 rounded-xl border border-green-200 bg-green-50 p-4">
                   <div className="flex items-center gap-3">
@@ -278,7 +390,7 @@ export const CheckoutDetailsTab = ({
                 </div>
               )}
 
-              {/* Old referral credit badge */}
+              {/* Referral credit badge */}
               {referralCredit > 0 && referralDiscount > 0 && (
                 <div className="mb-4 rounded-lg bg-green-50 border border-green-200 p-3">
                   <div className="flex items-center justify-between">
