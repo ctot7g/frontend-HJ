@@ -37,20 +37,30 @@ export function useCheckoutForm() {
   const [orderData, setOrderData] = React.useState<OrderData | null>(null);
   const [showGuestOptions, setShowGuestOptions] = React.useState(false);
 
-  const [formData, setFormData] = React.useState<FormData>({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    address: "",
-    country: "",
-    city: "",
-    state: "",
-    charges: "",
-    zipCode: "",
-    floorId: "",
-    differentBilling: false,
-    paymentMethod: "card",
+  // const [formData, setFormData] = React.useState<FormData>({
+  //   firstName: "",
+  //   lastName: "",
+  //   phone: "",
+  //   email: "",
+  //   address: "",
+  //   country: "",
+  //   city: "",
+  //   state: "",
+  //   charges: "",
+  //   zipCode: "",
+  //   floorId: "",
+  //   differentBilling: false,
+  //   paymentMethod: "card",
+  // });
+
+  const [formData, setFormData] = React.useState<FormData>(() => {
+    if (typeof window === "undefined") return { firstName: "", lastName: "", phone: "", email: "", address: "", country: "", city: "", state: "", charges: "", zipCode: "", floorId: "", differentBilling: false, paymentMethod: "card" };
+    try {
+      const saved = localStorage.getItem("checkoutFormData");
+      return saved ? JSON.parse(saved) : { firstName: "", lastName: "", phone: "", email: "", address: "", country: "", city: "", state: "", charges: "", zipCode: "", floorId: "", differentBilling: false, paymentMethod: "card" };
+    } catch {
+      return { firstName: "", lastName: "", phone: "", email: "", address: "", country: "", city: "", state: "", charges: "", zipCode: "", floorId: "", differentBilling: false, paymentMethod: "card" };
+    }
   });
 
   // Coupon state
@@ -147,6 +157,11 @@ export function useCheckoutForm() {
 
     fetchBalances();
   }, [user]);
+
+  // Save formData to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem("checkoutFormData", JSON.stringify(formData));
+  }, [formData]);
 
   // Pre-fill email
   React.useEffect(() => {

@@ -49,7 +49,7 @@ export default function InstallmentsPage() {
         <div className="mx-auto flex max-w-6xl items-center gap-4">
           <button
             onClick={() => router.push("/cart?step=3")}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800"
+            className="flex items-center gap-1 cursor-pointer text-sm text-gray-500 hover:text-gray-800"
           >
             <ChevronLeft size={16} />
             Back

@@ -55,54 +55,34 @@ const PaymentMethodStep = ({
   onPayInInstallments,
   onBack,
 }: PaymentMethodStepProps) => (
-  <div className="mt-6 flex flex-col items-center gap-6">
-    <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
-      <div className="mb-5 text-center">
-        <p className="text-xs uppercase tracking-widest text-gray-400">Order Total</p>
-        <p className="mt-1 text-4xl font-bold text-gray-900">£{grandTotal.toFixed(2)}</p>
-      </div>
+  <div className="flex flex-col gap-3">
+    <Button
+      onClick={onPayWithCard}
+      variant="primary"
+      size="xl"
+      rounded="full"
+      className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
+    >
+      Pay with Card
+    </Button>
 
-      <p className="mb-4 text-center text-sm font-medium text-gray-500">
-        How would you like to pay?
-      </p>
+    <Button
+      onClick={onPayInInstallments}
+      variant="primary"
+      size="xl"
+      rounded="full"
+      className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
+    >
+      Pay in Installments
+    </Button>
 
-      {/* Pay with Card */}
-      <button
-        onClick={onPayWithCard}
-        className="group mb-3 flex w-full items-center gap-4 rounded-xl border-2 border-blue-600 bg-blue-600 px-5 py-4 text-left transition-all hover:bg-blue-700 active:scale-[0.98]"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20">
-          <CreditCard size={20} className="text-white" />
-        </div>
-        <div>
-          <p className="font-semibold text-white">Pay with Card</p>
-          <p className="text-xs text-blue-100">Secure payment via Worldpay</p>
-        </div>
-      </button>
-
-      {/* Pay in Installments */}
-      <button
-        onClick={onPayInInstallments}
-        className="group flex w-full items-center gap-4 rounded-xl border-2 border-gray-200 bg-white px-5 py-4 text-left transition-all hover:border-purple-400 hover:bg-purple-50 active:scale-[0.98]"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100">
-          <CalendarDays size={20} className="text-purple-700" />
-        </div>
-        <div>
-          <p className="font-semibold text-gray-800">Pay in Installments</p>
-          <p className="text-xs text-gray-500">0% APR · Up to 48 months interest free</p>
-        </div>
-      </button>
-
-      {/* Back */}
-      <button
-        onClick={onBack}
-        className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
-      >
-        <ChevronLeft size={14} />
-        Back to details
-      </button>
-    </div>
+    <button
+      onClick={onBack}
+      className="mt-2 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
+    >
+      <ChevronLeft size={14} />
+      Back to details
+    </button>
   </div>
 );
 
