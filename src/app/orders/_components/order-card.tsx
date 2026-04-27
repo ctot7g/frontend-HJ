@@ -88,7 +88,7 @@ export function OrderCard({ order }: { order: Order }) {
   const totalAmount = calculateOrderGrandTotal(order);
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden w-full max-w-full">
       <CardContent className="p-6">
         <div className="mb-4 flex items-start justify-between">
           <div className="space-y-1">
@@ -119,7 +119,7 @@ export function OrderCard({ order }: { order: Order }) {
         {/* Order Items Preview */}
         {order.items && order.items.length > 0 && (
           <div className="mb-4">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-2">
               {order.items.slice(0, 3).map((item) => {
                 const hasItemDiscount =
                   item.original_price != null &&
@@ -128,7 +128,7 @@ export function OrderCard({ order }: { order: Order }) {
                 return (
                   <div
                     key={item.id}
-                    className="flex min-w-0 flex-shrink-0 items-center gap-2"
+                    className="flex min-w-0 sm:flex-shrink-0 items-center gap-2"
                   >
                     <div className="relative size-16">
                       {item.image_url ? (
@@ -144,7 +144,7 @@ export function OrderCard({ order }: { order: Order }) {
                         </div>
                       )}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="max-w-[200px] truncate text-sm font-medium">
                         {item.variant.product.name}
                       </p>
@@ -186,7 +186,7 @@ export function OrderCard({ order }: { order: Order }) {
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 w-full">
           {/* Left Side */}
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <MapPinIcon className="h-3 w-3" />
@@ -196,7 +196,7 @@ export function OrderCard({ order }: { order: Order }) {
           </div>
 
           {/* Right Buttons */}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">

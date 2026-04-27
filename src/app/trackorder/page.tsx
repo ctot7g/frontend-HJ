@@ -65,7 +65,7 @@ export default function TrackOrderPage() {
   };
 
   return (
-    <div className="px-[32px] py-8">
+    <div className="px-4 sm:px-[32px] py-8">
       <div className="mb-8">
         <h1 className="font-bebas text-3xl">Track Order</h1>
         <p className="text-muted-foreground mt-1">

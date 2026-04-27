@@ -75,7 +75,7 @@ export default function OrdersPage() {
   // Show auth loading state
   if (authLoading) {
     return (
-      <div className="px-[32px] py-12">
+      <div className="px-4 sm:px-[32px] py-12">
         <div className="flex flex-col items-center justify-center px-4 py-12">
           <Loader2 className="mb-4 h-8 w-8 animate-spin" />
           <p className="text-muted-foreground">Checking authentication...</p>
@@ -87,7 +87,7 @@ export default function OrdersPage() {
   // Check if user is authenticated
   if (!user || !session) {
     return (
-      <div className="px-[32px] py-12">
+      <div className="px-4 sm:px-[32px] py-12">
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -114,7 +114,7 @@ export default function OrdersPage() {
           <p className="text-muted-foreground mb-8 max-w-md text-center">
             Please sign in to view your orders.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-stretch sm:items-center">
             <Button asChild>
               <Link href="/login">Sign In</Link>
             </Button>
@@ -133,7 +133,7 @@ export default function OrdersPage() {
   // Loading state
   if (isLoading && orders.length === 0) {
     return (
-      <div className="px-[32px] py-12">
+      <div className="px-4 sm:px-[32px] py-12">
         <div className="flex flex-col items-center justify-center px-4 py-12">
           <Loader2 className="mb-4 h-8 w-8 animate-spin" />
           <p className="text-muted-foreground">Loading your orders...</p>
@@ -145,7 +145,7 @@ export default function OrdersPage() {
   // Empty state
   if (totalItems === 0 && !isLoading) {
     return (
-      <div className="px-[32px] py-12">
+      <div className="px-4 sm:px-[32px] py-12">
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -173,7 +173,7 @@ export default function OrdersPage() {
             You haven&apos;t placed any orders yet. Start shopping to see your
             orders here.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-stretch sm:items-center">
             <Button asChild>
               <Link href="/products">Start Shopping</Link>
             </Button>
@@ -190,7 +190,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="px-[32px] py-8">
+    <div className="px-4 sm:px-[32px] py-8 w-full overflow-x-hidden">
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -207,7 +207,7 @@ export default function OrdersPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-bebas text-3xl">My Orders</h1>
           <p className="text-muted-foreground mt-1">
@@ -279,7 +279,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
+      <div className="space-y-4 w-full overflow-hidden">
         {orders.map((order) => (
           <OrderCard key={order.id} order={order} />
         ))}
