@@ -203,7 +203,7 @@ export default function InstallmentsPage() {
               <>
                 <hr className="my-4 border-gray-200" />
                 <p className="mb-3 text-center text-sm text-gray-500">
-                  Loan approved? Pay your deposit now.
+                  Loan approved ? Pay your deposit now.
                 </p>
                 <button
                   onClick={handlePayDeposit}
