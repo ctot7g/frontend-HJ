@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChevronLeft, Info } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const DEPOSIT_OPTIONS = [0, 10, 20, 30, 40, 50]; // percentages
-const TERM_OPTIONS = [6, 12, 18, 24, 30, 36, 48]; // months
+const DEPOSIT_OPTIONS = [10, 20, 30, 40, 50]; // percentages
+const TERM_OPTIONS = [6, 12, 24, 36]; // months
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -21,25 +21,34 @@ export default function InstallmentsPage() {
   const floor = parseFloat(params.get("floor") || "0");
   const shipping = parseFloat(params.get("shipping") || "0");
   const discount = parseFloat(params.get("discount") || "0");
-  const productSubtotal = total - floor - shipping + discount; // reverse-derive
+  const productSubtotal = total - floor - shipping + discount;
 
-  const [depositPct, setDepositPct] = useState(0);
-  const [term, setTerm] = useState(48);
+  const [depositPct, setDepositPct] = useState(10);
+  const [term, setTerm] = useState(6);
+
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [savedDeposit, setSavedDeposit] = useState(0);
+
+  useEffect(() => {
+    const url = localStorage.getItem("installment_payment_url");
+    const deposit = localStorage.getItem("installment_deposit");
+    if (url) setPaymentUrl(url);
+    if (deposit) setSavedDeposit(parseFloat(deposit));
+  }, []);
 
   const depositAmount = useMemo(() => (total * depositPct) / 100, [total, depositPct]);
   const creditAmount = useMemo(() => total - depositAmount, [total, depositAmount]);
   const monthlyPayment = useMemo(() => (term > 0 ? creditAmount / term : 0), [creditAmount, term]);
 
   const handleProceed = () => {
-    const p = new URLSearchParams({
-      total: total.toFixed(2),
-      deposit: depositAmount.toFixed(2),
-      credit: creditAmount.toFixed(2),
-      term: String(term),
-      monthly: monthlyPayment.toFixed(2),
-      method: "installments",
-    });
-    router.push(`/checkout/payment?${p.toString()}`);
+    window.location.href = "https://ideal4finance.com/loan-apply/aleena?r=ob";
+  };
+
+  const handlePayDeposit = () => {
+    if (!paymentUrl) return;
+    localStorage.removeItem("installment_payment_url");
+    localStorage.removeItem("installment_deposit");
+    window.location.href = paymentUrl;
   };
 
   return (
@@ -186,10 +195,24 @@ export default function InstallmentsPage() {
 
             <button
               onClick={handleProceed}
-              className="mt-6 w-full rounded-full bg-[#3d1a6e] px-8 py-4 font-semibold text-white shadow-md transition-all hover:bg-[#2e1356] active:scale-[0.98]"
+              className="mt-6 w-full cursor-pointer rounded-full bg-[#3d1a6e] px-8 py-4 font-semibold text-white shadow-md transition-all hover:bg-[#2e1356] active:scale-[0.98]"
             >
               Continue with Installments →
             </button>
+            {paymentUrl && (
+              <>
+                <hr className="my-4 border-gray-200" />
+                <p className="mb-3 text-center text-sm text-gray-500">
+                  Loan approved? Pay your deposit now.
+                </p>
+                <button
+                  onClick={handlePayDeposit}
+                  className="w-full rounded-full bg-green-600 px-8 py-4 font-semibold text-white shadow-md hover:bg-green-700"
+                >
+                  Pay Deposit — £{fmt(savedDeposit)}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

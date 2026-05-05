@@ -153,6 +153,7 @@ export default function CartPage() {
           walletDiscount={walletDiscount}
           useWallet={useWallet}
           setUseWallet={setUseWallet}
+          onPlaceOrder={handlePlaceOrder}
           couponProps={{
             couponCode,
             setCouponCode,

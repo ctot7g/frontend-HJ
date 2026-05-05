@@ -44,7 +44,7 @@ export interface FormData {
   zipCode: string;
   floorId: string;
   differentBilling: boolean;
-  paymentMethod: "card" | "cod";
+  paymentMethod: "card" | "cod" | "installments";
   isGuest?: boolean;
   createAccount?: boolean;
   coupon_code?: string;

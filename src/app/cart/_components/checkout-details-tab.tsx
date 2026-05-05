@@ -39,6 +39,12 @@ interface CheckoutDetailsTabProps {
   walletDiscount: number;
   useWallet: boolean;
   setUseWallet: (val: boolean) => void;
+  onPlaceOrder: (installmentMeta?: {
+    grandTotal: number;
+    floorCharge: number;
+    zonalCharges: number;
+    depositAmount: number;  
+  }) => void;
 }
 
 // ─── Payment Method Selection Overlay ────────────────────────────────────────
@@ -89,6 +95,7 @@ const PaymentMethodStep = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const CheckoutDetailsTab = ({
   onNext,
+  onPlaceOrder,
   formData,
   setFormData,
   isProcessing = false,
@@ -159,22 +166,18 @@ export const CheckoutDetailsTab = ({
     setShowPaymentChoice(true);
   };
 
-  // ── "Pay with Card" → proceed to Worldpay (existing onNext flow) ─────────────
+  const depositAmount = parseFloat((grandTotal * 0.1).toFixed(2));
+
   const handlePayWithCard = () => {
     setShowPaymentChoice(false);
-    onNext(); // existing handler that triggers Worldpay
+    setFormData({ ...formData, paymentMethod: "card" });
+    onPlaceOrder();
   };
 
-  // ── "Pay in Installments" → navigate to installments page ───────────────────
   const handlePayInInstallments = () => {
-    // Pass grand total + order meta via query params (or you can use session/store)
-    const params = new URLSearchParams({
-      total: grandTotal.toFixed(2),
-      floor: floorCharge.toFixed(2),
-      shipping: zonalCharges.toFixed(2),
-      discount: discountAmount.toFixed(2),
-    });
-    router.push(`/installments?${params.toString()}`);
+    setShowPaymentChoice(false);
+    setFormData({ ...formData, paymentMethod: "installments" });
+    onPlaceOrder({ grandTotal, floorCharge, zonalCharges, depositAmount });
   };
 
   return (

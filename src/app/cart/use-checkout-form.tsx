@@ -37,21 +37,6 @@ export function useCheckoutForm() {
   const [orderData, setOrderData] = React.useState<OrderData | null>(null);
   const [showGuestOptions, setShowGuestOptions] = React.useState(false);
 
-  // const [formData, setFormData] = React.useState<FormData>({
-  //   firstName: "",
-  //   lastName: "",
-  //   phone: "",
-  //   email: "",
-  //   address: "",
-  //   country: "",
-  //   city: "",
-  //   state: "",
-  //   charges: "",
-  //   zipCode: "",
-  //   floorId: "",
-  //   differentBilling: false,
-  //   paymentMethod: "card",
-  // });
 
   const [formData, setFormData] = React.useState<FormData>(() => {
     if (typeof window === "undefined") return { firstName: "", lastName: "", phone: "", email: "", address: "", country: "", city: "", state: "", charges: "", zipCode: "", floorId: "", differentBilling: false, paymentMethod: "card" };
@@ -62,6 +47,25 @@ export function useCheckoutForm() {
       return { firstName: "", lastName: "", phone: "", email: "", address: "", country: "", city: "", state: "", charges: "", zipCode: "", floorId: "", differentBilling: false, paymentMethod: "card" };
     }
   });
+
+
+  React.useEffect(() => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      email: "",
+      address: "",
+      country: "",
+      city: "",
+      state: "",
+      charges: "",
+      zipCode: "",
+      floorId: "",
+      differentBilling: false,
+      paymentMethod: "card",
+    });
+  }, []);
 
   // Coupon state
   const [couponCode, setCouponCode] = React.useState("");
@@ -371,7 +375,12 @@ export function useCheckoutForm() {
     setCouponError("");
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (installmentMeta?: {
+    grandTotal: number;
+    floorCharge: number;
+    zonalCharges: number;
+    depositAmount: number;
+  }) => {
     try {
       setIsProcessingPayment(true);
       const validationErrors = validateFormData();
@@ -431,6 +440,25 @@ export function useCheckoutForm() {
       }
 
       const authToken = formData.isGuest ? undefined : SessionManager.getAccessToken();
+
+      if (formData.paymentMethod === "installments" && installmentMeta) {
+        const paymentResponse = await PaymentApiService.createPayment(
+          paymentData,
+          authToken || undefined
+        );
+        localStorage.setItem("installment_payment_url", paymentResponse.payment_url);
+        localStorage.setItem("installment_deposit", installmentMeta.depositAmount.toFixed(2));
+        toast.dismiss("payment-processing");
+        setIsProcessingPayment(false);
+        const p = new URLSearchParams({
+          total: installmentMeta.grandTotal.toFixed(2),
+          floor: installmentMeta.floorCharge.toFixed(2),
+          shipping: installmentMeta.zonalCharges.toFixed(2),
+          discount: discountAmount.toFixed(2),
+        });
+        window.location.href = `/installments?${p.toString()}`;
+        return;
+      }
 
       if (formData.paymentMethod === "cod") {
         const codResponse = await PaymentApiService.createCODOrder(
