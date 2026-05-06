@@ -106,6 +106,11 @@ const getStatusBadge = (status: OrderStatus) => {
       className: "border-0 bg-red-100 text-red-800 hover:bg-red-100",
       label: "Cancelled",
     },
+    loan_approved: {
+  icon: CheckCircle2,
+  className: "border-0 bg-purple-100 text-purple-800 hover:bg-purple-100",
+  label: "Loan Approved",
+},
   };
 
   const config = statusConfig[status];
@@ -146,11 +151,13 @@ const getAllowedStatusTransitions = (
 ): OrderStatus[] => {
   switch (currentStatus) {
     case "pending":
-      return ["paid", "shipped", "cancelled"]; // COD orders can go directly to shipped
+      return ["paid", "shipped", "cancelled", "loan_approved"];
     case "paid":
       return ["shipped", "cancelled"];
     case "shipped":
       return ["delivered", "cancelled"];
+    case "loan_approved":
+      return ["paid", "cancelled"];
     case "delivered":
       return ["cancelled"];
     case "cancelled":
@@ -302,6 +309,7 @@ export default function OrdersPage() {
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="loan_approved">Loan Approved</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="shipped">Shipped</SelectItem>
               <SelectItem value="delivered">Delivered</SelectItem>
@@ -526,6 +534,10 @@ const hasDiscount = hasProductDiscount || hasCouponDiscount;
                                           cancelled: {
                                             icon: XCircle,
                                             label: "Cancelled",
+                                          },
+                                          loan_approved: { 
+                                            icon: CheckCircle2,
+                                            label: "Loan Approved"
                                           },
                                         }[status];
 
@@ -1633,6 +1645,7 @@ const hasItemDiscount = originalPrice > discountedPrice;
                             shipped: { icon: TruckIcon, label: "Shipped" },
                             delivered: { icon: CheckCircle2, label: "Delivered" },
                             cancelled: { icon: XCircle, label: "Cancelled" },
+                            loan_approved: { icon: CheckCircle2, label: "Loan Approved" },
                           }[status];
 
                           const IconComponent = config.icon;

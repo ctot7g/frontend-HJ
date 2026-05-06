@@ -6,7 +6,8 @@ export type OrderStatus =
   | "paid"
   | "shipped"
   | "delivered"
-  | "cancelled";
+  | "cancelled"
+  | "loan_approved";
 
 export interface Address {
   recipient_name: string;
@@ -86,6 +87,9 @@ export interface Order {
     zip_code: string;
     delivery_charges: number;
   } | null;
+  deposit_amount?: number;
+  deposit_percentage?: number;
+  installment_term?: number;
 }
 
 export interface OrdersListResponse {

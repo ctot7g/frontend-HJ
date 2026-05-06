@@ -375,12 +375,12 @@ export function useCheckoutForm() {
     setCouponError("");
   };
 
-  const handlePlaceOrder = async (installmentMeta?: {
-    grandTotal: number;
-    floorCharge: number;
-    zonalCharges: number;
-    depositAmount: number;
-  }) => {
+const handlePlaceOrder = async (installmentMeta?: {
+  grandTotal: number;
+  floorCharge: number;
+  zonalCharges: number;
+  depositAmount: number;
+}, paymentMethodOverride?: string) => {
     try {
       setIsProcessingPayment(true);
       const validationErrors = validateFormData();
@@ -441,7 +441,7 @@ export function useCheckoutForm() {
 
       const authToken = formData.isGuest ? undefined : SessionManager.getAccessToken();
 
-      if (formData.paymentMethod === "installments" && installmentMeta) {
+      if ((paymentMethodOverride === "installments" || formData.paymentMethod === "installments") && installmentMeta) {
         const paymentResponse = await PaymentApiService.createPayment(
           paymentData,
           authToken || undefined

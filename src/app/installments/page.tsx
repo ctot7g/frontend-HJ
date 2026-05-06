@@ -40,9 +40,31 @@ export default function InstallmentsPage() {
   const creditAmount = useMemo(() => total - depositAmount, [total, depositAmount]);
   const monthlyPayment = useMemo(() => (term > 0 ? creditAmount / term : 0), [creditAmount, term]);
 
-  const handleProceed = () => {
-    window.location.href = "https://ideal4finance.com/loan-apply/aleena?r=ob";
-  };
+const handleProceed = async () => {
+  // Save to localStorage
+  localStorage.setItem("installment_deposit_pct", depositPct.toString());
+  localStorage.setItem("installment_deposit", depositAmount.toFixed(2));
+
+  // Save to DB so email link works on any device
+  const orderId = localStorage.getItem("installment_order_id");
+  if (orderId) {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/deposit-info`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deposit_amount: depositAmount,
+          deposit_percentage: depositPct,
+          installment_term: term,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save deposit info to DB:", err);
+    }
+  }
+
+  window.location.href = "https://ideal4finance.com/loan-apply/aleena?r=ob";
+};
 
   const handlePayDeposit = () => {
     if (!paymentUrl) return;
@@ -156,6 +178,12 @@ export default function InstallmentsPage() {
                 );
               })}
             </div>
+            <button
+              onClick={handleProceed}
+              className="mt-6 w-full cursor-pointer rounded-full bg-[#3d1a6e] px-8 py-4 font-semibold text-white shadow-md transition-all hover:bg-[#2e1356] active:scale-[0.98]"
+            >
+              Continue with Installments →
+            </button>
           </div>
 
         </div>
@@ -193,13 +221,13 @@ export default function InstallmentsPage() {
             </div>
 
 
-            <button
+            {/* <button
               onClick={handleProceed}
               className="mt-6 w-full cursor-pointer rounded-full bg-[#3d1a6e] px-8 py-4 font-semibold text-white shadow-md transition-all hover:bg-[#2e1356] active:scale-[0.98]"
             >
               Continue with Installments →
-            </button>
-            {paymentUrl && (
+            </button> */}
+            {/* {paymentUrl && (
               <>
                 <hr className="my-4 border-gray-200" />
                 <p className="mb-3 text-center text-sm text-gray-500">
@@ -212,7 +240,7 @@ export default function InstallmentsPage() {
                   Pay Deposit — £{fmt(savedDeposit)}
                 </button>
               </>
-            )}
+            )} */}
           </div>
         </div>
       </div>

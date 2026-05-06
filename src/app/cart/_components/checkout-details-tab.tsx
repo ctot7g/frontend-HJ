@@ -43,8 +43,8 @@ interface CheckoutDetailsTabProps {
     grandTotal: number;
     floorCharge: number;
     zonalCharges: number;
-    depositAmount: number;  
-  }) => void;
+    depositAmount: number;
+  }, paymentMethodOverride?: string) => void;
 }
 
 // ─── Payment Method Selection Overlay ────────────────────────────────────────
@@ -174,11 +174,10 @@ export const CheckoutDetailsTab = ({
     onPlaceOrder();
   };
 
-  const handlePayInInstallments = () => {
-    setShowPaymentChoice(false);
-    setFormData({ ...formData, paymentMethod: "installments" });
-    onPlaceOrder({ grandTotal, floorCharge, zonalCharges, depositAmount });
-  };
+const handlePayInInstallments = () => {
+  setShowPaymentChoice(false);
+  onPlaceOrder({ grandTotal, floorCharge, zonalCharges, depositAmount }, "installments");
+};
 
   return (
     <div className="px-0.5 md:px-8">
