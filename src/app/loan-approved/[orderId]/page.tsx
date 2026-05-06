@@ -136,11 +136,11 @@ useEffect(() => {
     <div className="min-h-screen bg-white font-sans">
       <div className="mx-auto max-w-4xl px-4 py-10">
         {/* Success Banner */}
-        <div className="mb-8 rounded-xl bg-green-50 border border-green-200 p-6 text-center">
-          <h1 className="text-2xl font-bold text-green-800 mb-2">
+        <div className="mb-8 rounded-xl bg-blue-100 border border-blue-200 p-6 text-center">
+          <h1 className="text-2xl font-bold text-blue-800 mb-2">
             🎉 Your Loan Has Been Approved!
           </h1>
-          <p className="text-green-600 text-sm">
+          <p className="text-blue-600 text-sm">
             Order #{orderId.slice(0, 8).toUpperCase()} — Pay your deposit to confirm your order.
           </p>
         </div>
@@ -185,7 +185,7 @@ useEffect(() => {
               <div className="pt-2">
                 <button
                     onClick={handlePayDeposit}
-                    className="w-full cursor-pointer rounded-full bg-green-600 px-8 py-4 font-semibold text-white shadow-md hover:bg-green-700 active:scale-[0.98] transition-all"
+                    className="w-full cursor-pointer rounded-full bg-blue-600 px-8 py-4 font-semibold text-white shadow-md hover:bg-blue-700 active:scale-[0.98] transition-all"
                 >
                     Pay Deposit — £{fmt(depositAmount)}
                 </button>
