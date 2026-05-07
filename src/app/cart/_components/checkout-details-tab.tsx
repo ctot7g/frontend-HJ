@@ -459,7 +459,7 @@ const handlePayInInstallments = () => {
                 </Button>
                 <button
                   onClick={() => setShowPaymentChoice(false)}
-                  className="mt-1 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
+                  className="mt-1 cursor-pointer flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
                 >
                   <ChevronLeft size={14} />
                   Back to details
