@@ -2020,13 +2020,13 @@ const hasItemDiscount = originalPrice > discountedPrice;
     </div>
 
     <DialogFooter>
-      <Button variant="outline" onClick={() => setIsLoanApprovalDialogOpen(false)}>
+      <Button className="cursor-pointer" variant="outline" onClick={() => setIsLoanApprovalDialogOpen(false)}>
         Cancel
       </Button>
       <Button
         onClick={handleSendLoanApproval}
         disabled={isSendingLoanApproval}
-        className="bg-green-600 hover:bg-green-700 text-white"
+        className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
       >
         {isSendingLoanApproval ? "Sending..." : "Send Approval Email"}
       </Button>

@@ -79,7 +79,7 @@ const PaymentMethodStep = ({
       rounded="full"
       className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
     >
-      Spread the Payment
+      Spread the Cost
     </Button>
 
     <button

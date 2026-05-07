@@ -449,6 +449,7 @@ const handlePlaceOrder = async (installmentMeta?: {
         localStorage.setItem("installment_payment_url", paymentResponse.payment_url);
         localStorage.setItem("installment_deposit", installmentMeta.depositAmount.toFixed(2));
         localStorage.setItem("installment_order_id", paymentResponse.order_id);
+        localStorage.setItem("installment_payment_fields", JSON.stringify(paymentResponse.payment_fields || {}));
         toast.dismiss("payment-processing");
         setIsProcessingPayment(false);
         const p = new URLSearchParams({

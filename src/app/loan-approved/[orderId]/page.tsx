@@ -29,6 +29,10 @@ useEffect(() => {
   const fetchOrder = async () => {
   try {
     const res = await ApiService.fetchWithAuth(`/orders/${orderId}`);
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = `/login?redirect=/loan-approved/${orderId}`;
+      return;
+    }
     if (res.ok) {
       const data = await res.json();
 
@@ -61,6 +65,15 @@ useEffect(() => {
           }
         }
 
+        const savedUrl = localStorage.getItem("installment_payment_url");
+        const savedFields = localStorage.getItem("installment_payment_fields");
+        if (savedUrl) setPaymentUrl(savedUrl);
+        if (savedFields) {
+          try {
+            setPaymentFields(JSON.parse(savedFields));
+          } catch {}
+        }
+
         // Set deposit percentage
         if (data.admin_deposit_percentage) {
           setDepositPct(data.admin_deposit_percentage);
@@ -86,6 +99,8 @@ useEffect(() => {
       }
     } catch (err) {
       console.error("Failed to fetch order:", err);
+      // Redirect to login with return URL
+      window.location.href = `/login?redirect=/loan-approved/${orderId}`;
     } finally {
       setLoading(false);
     }
@@ -95,9 +110,35 @@ useEffect(() => {
 }, [orderId]);
 
     const handlePayDeposit = () => {
-      const gatewayUrl = paymentUrl || process.env.NEXT_PUBLIC_CARDSTREAM_GATEWAY_URL || "https://gateway.cardstream.com/hosted/paymentform/";
-      window.location.href = gatewayUrl;
-    };
+  if (!paymentUrl || !paymentFields) {
+    toast.error("Payment session expired. Please go through checkout again.");
+    return;
+  }
+
+  // Clear localStorage
+  localStorage.removeItem("installment_payment_url");
+  localStorage.removeItem("installment_payment_fields");
+  localStorage.removeItem("installment_deposit");
+  localStorage.removeItem("installment_deposit_pct");
+  localStorage.removeItem("installment_order_id");
+
+  // Build hidden form and POST to Cardstream
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = paymentUrl;
+  form.style.display = "none";
+
+  Object.entries(paymentFields).forEach(([key, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+};
 
   if (loading) {
     return (
