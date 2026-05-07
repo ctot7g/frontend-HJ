@@ -1001,9 +1001,9 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                     )}
                   </div>
 
-                  <span className="w-fit rounded-full bg-[#FFA8CD] px-4 py-1 text-sm font-bold text-[#000] md:px-6 md:py-2">
+                  {/* <span className="w-fit rounded-full bg-[#FFA8CD] px-4 py-1 text-sm font-bold text-[#000] md:px-6 md:py-2">
                     Klarna
-                  </span>
+                  </span> */}
                 </div>
               </div>
             </div>
@@ -1214,11 +1214,11 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
             )}
 
             {/* Klarna instalment line */}
-            <div className="mt-3">
+            {/* <div className="mt-3">
               <span className="text-[16px] text-[#999] md:text-[18px] lg:text-[20px]">
                 Make 3 Payments Of £{(currentDiscountedPrice / 3).toFixed(2)}
               </span>
-            </div>
+            </div> */}
 
             {/* Description */}
             <div className="space-y-1">
@@ -1324,7 +1324,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                               <AccordionTrigger>Payment</AccordionTrigger>
                               <AccordionContent>
                                 <div className="text-sm text-[#999]">
-                                  We accept all major credit/debit cards, Klarna, and PayPal. Pay in 3 with Klarna available at checkout.
+                                  We accept all major credit/debit cards inlcuding Visa, Master and American Express.
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
@@ -1370,7 +1370,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[
                   { value: "delivery", label: "Delivery", content: getDeliveryDetails() },
-                  { value: "payment", label: "Payment", content: "We accept all major credit/debit cards, Klarna, and PayPal. Pay in 3 with Klarna available at checkout." },
+                  { value: "payment", label: "Payment", content: "We accept all major credit/debit cards including Visa, Master and American Express." },
                   { value: "warranty", label: "Warranty", content: variantWithExtras?.warranty_info || product?.warranty_info || "All sofas come with a 10-year frame warranty and 2-year fabric warranty." },
                   { value: "availability", label: "Availability", content: "Most products are in stock for fast delivery. Stock status is shown above. Contact us for special orders." },
                 ].map(({ value, label, content }) => (
