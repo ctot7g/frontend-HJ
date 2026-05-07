@@ -61,19 +61,23 @@ useEffect(() => {
         }
 
         // Set deposit percentage
-        if (data.deposit_percentage) {
+        if (data.admin_deposit_percentage) {
+          setDepositPct(data.admin_deposit_percentage);
+        } else if (data.deposit_percentage) {
           setDepositPct(data.deposit_percentage);
         } else {
-          const savedDepositPct = localStorage.getItem("installment_deposit_pct");
-          if (savedDepositPct) {
+            const savedDepositPct = localStorage.getItem("installment_deposit_pct");
+            if (savedDepositPct) {
             setDepositPct(parseInt(savedDepositPct));
-          } else {
-            setDepositPct(10); // Default to 10%
+            } else {
+              setDepositPct(10); // Default to 10%
           }
         }
 
         // Set installment term
-        if (data.installment_term) {
+        if (data.admin_installment_term) {
+          setInstallmentTerm(data.admin_installment_term);
+        } else if (data.installment_term) {
           setInstallmentTerm(data.installment_term);
         } else {
           setInstallmentTerm(6); // Default to 6 months

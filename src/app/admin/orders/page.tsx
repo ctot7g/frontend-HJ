@@ -176,12 +176,18 @@ export default function OrdersPage() {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
-  const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
-  const [loanOrderId, setLoanOrderId] = useState<string>("");
-  const [loanOrderData, setLoanOrderData] = useState<Order | null>(null);
-  const [actualDepositPct, setActualDepositPct] = useState(10);
-  const [actualTerm, setActualTerm] = useState(6);
-  const [isSendingLoanEmail, setIsSendingLoanEmail] = useState(false);
+const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
+const [loanOrderId, setLoanOrderId] = useState<string>("");
+const [loanOrderData, setLoanOrderData] = useState<Order | null>(null);
+const [actualDepositPct, setActualDepositPct] = useState(10);
+const [actualTerm, setActualTerm] = useState(6);
+const [isSendingLoanEmail, setIsSendingLoanEmail] = useState(false);
+
+  const [isLoanApprovalDialogOpen, setIsLoanApprovalDialogOpen] = useState(false);
+const [loanApprovalOrder, setLoanApprovalOrder] = useState<Order | null>(null);
+const [adminDepositPct, setAdminDepositPct] = useState(10);
+const [adminTerm, setAdminTerm] = useState(6);
+const [isSendingLoanApproval, setIsSendingLoanApproval] = useState(false);
 
   const limit = 10;
 
@@ -205,32 +211,47 @@ export default function OrdersPage() {
     setIsViewDialogOpen(true);
   };
 
-  const handleStatusChange = async (
-    orderId: string,
-    newStatus: OrderStatus,
-    order?: Order
-  ) => {
-    if (newStatus === "loan_approved") {
-      // Open the loan approval popup instead of directly updating
-      const targetOrder = order || data?.items.find((o) => o.id === orderId) || null;
-      setLoanOrderId(orderId);
-      setLoanOrderData(targetOrder);
-      // Pre-fill with customer's applied values if available
-      setActualDepositPct(targetOrder?.deposit_percentage || 10);
-      setActualTerm(targetOrder?.installment_term || 6);
-      setIsLoanDialogOpen(true);
-      return;
-    }
-    try {
-      await updateOrderStatus.mutateAsync({
-        id: orderId,
-        data: { status: newStatus },
-      });
-      toast.success(`Order status updated to ${newStatus}`);
-    } catch {
-      toast.error("Failed to update order status");
-    }
-  };
+const handleStatusChange = async (orderId: string, newStatus: OrderStatus, orderObj?: Order | null) => {
+  if (newStatus === "loan_approved") {
+    const order = orderObj || data?.items.find((o) => o.id === orderId) || selectedOrder;
+    setLoanApprovalOrder(order || null);
+    setAdminDepositPct(order?.deposit_percentage || 10);
+    setAdminTerm(order?.installment_term || 6);
+    setIsLoanApprovalDialogOpen(true);
+    return;
+  }
+  try {
+    await updateOrderStatus.mutateAsync({ id: orderId, data: { status: newStatus } });
+    toast.success(`Order status updated to ${newStatus}`);
+  } catch {
+    toast.error("Failed to update order status");
+  }
+};
+
+
+const handleSendLoanApproval = async () => {
+  if (!loanApprovalOrder) return;
+  setIsSendingLoanApproval(true);
+  try {
+    await updateOrderStatus.mutateAsync({
+      id: loanApprovalOrder.id,
+      data: {
+        status: "loan_approved",
+        deposit_amount: (calculateOrderGrandTotal(loanApprovalOrder) * adminDepositPct) / 100,
+        deposit_percentage: adminDepositPct,
+        installment_term: adminTerm,
+        admin_deposit_percentage: adminDepositPct,
+        admin_installment_term: adminTerm,
+      } as any,
+    });
+    setIsLoanApprovalDialogOpen(false);
+    toast.success("Loan approved and email sent to customer");
+  } catch {
+    toast.error("Failed to send loan approval");
+  } finally {
+    setIsSendingLoanApproval(false);
+  }
+};
 
   const handleCancelOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -1927,6 +1948,87 @@ const hasItemDiscount = originalPrice > discountedPrice;
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog open={isLoanApprovalDialogOpen} onOpenChange={setIsLoanApprovalDialogOpen}>
+  <DialogContent className="max-w-2xl">
+    <DialogHeader>
+      <DialogTitle>Loan Approval — Order #{loanApprovalOrder?.id.slice(0, 8).toUpperCase()}</DialogTitle>
+      <DialogDescription>
+        Review customer demand and set actual approved terms before sending.
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="grid grid-cols-2 gap-6 py-4">
+      {/* Left: Customer Demand */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-900 border-b pb-2">Customer Demand</h3>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-sm text-gray-600">Deposit %</Label>
+            <input
+              type="number"
+              value={loanApprovalOrder?.deposit_percentage || 0}
+              readOnly
+              className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <Label className="text-sm text-gray-600">Tenure (Months)</Label>
+            <input
+              type="number"
+              value={loanApprovalOrder?.installment_term || 0}
+              readOnly
+              className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Right: Actual Data */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-900 border-b pb-2">Actual Data</h3>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-sm text-gray-600">Deposit % (10, 20, 30, 40, 50 only)</Label>
+            <select
+              value={adminDepositPct}
+              onChange={(e) => setAdminDepositPct(Number(e.target.value))}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {[10, 20, 30, 40, 50].map((pct) => (
+                <option key={pct} value={pct}>{pct}%</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label className="text-sm text-gray-600">Tenure (6, 12, 24, 36 months only)</Label>
+            <select
+              value={adminTerm}
+              onChange={(e) => setAdminTerm(Number(e.target.value))}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {[6, 12, 24, 36].map((t) => (
+                <option key={t} value={t}>{t} Months</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setIsLoanApprovalDialogOpen(false)}>
+        Cancel
+      </Button>
+      <Button
+        onClick={handleSendLoanApproval}
+        disabled={isSendingLoanApproval}
+        className="bg-green-600 hover:bg-green-700 text-white"
+      >
+        {isSendingLoanApproval ? "Sending..." : "Send Approval Email"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
     </div>
   );
 }

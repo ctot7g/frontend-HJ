@@ -90,6 +90,8 @@ export interface Order {
   deposit_amount?: number;
   deposit_percentage?: number;
   installment_term?: number;
+  admin_deposit_percentage?: number;
+  admin_installment_term?: number;
 }
 
 export interface OrdersListResponse {
