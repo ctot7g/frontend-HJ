@@ -24,6 +24,7 @@ import {
   PackageOpenIcon,
   TruckIcon,
   XCircleIcon,
+  CheckCircle2,
   XIcon,
   Truck
 } from "lucide-react";
@@ -73,6 +74,12 @@ const orderStatusConfig: Record<
     variant: "destructive",
     icon: XCircleIcon,
     color: "text-red-600",
+  },
+  loan_approved: {
+    label: "Loan Approved",
+    variant: "warning",
+    icon: CheckCircle2,
+    color: "text-purple-600",
   },
 };
 
