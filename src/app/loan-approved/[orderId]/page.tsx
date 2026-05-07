@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 import { ApiService } from "@/lib/api-service";
 
@@ -94,15 +95,8 @@ useEffect(() => {
 }, [orderId]);
 
     const handlePayDeposit = () => {
-        if (!paymentUrl) {
-            // No payment URL — send back to cart to regenerate
-            window.location.href = "https://ideal4finance.com/loan-apply/aleena?r=ob";
-            return;
-        }
-        localStorage.removeItem("installment_payment_url");
-        localStorage.removeItem("installment_deposit");
-        localStorage.removeItem("installment_deposit_pct");
-        window.location.href = paymentUrl;
+      const gatewayUrl = paymentUrl || process.env.NEXT_PUBLIC_CARDSTREAM_GATEWAY_URL || "https://gateway.cardstream.com/hosted/paymentform/";
+      window.location.href = gatewayUrl;
     };
 
   if (loading) {

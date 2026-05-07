@@ -125,7 +125,7 @@ const handleAddToCart = async () => {
       </div>
 
       {/* 3. Klarna Payment Option (always after prices) */}
-      {paymentOption && (
+      {/* {paymentOption && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span
@@ -140,7 +140,7 @@ const handleAddToCart = async () => {
             {formatPrice(paymentOption.amount)}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* 4. Add to Cart Button */}
       <button
@@ -163,7 +163,7 @@ const handleAddToCart = async () => {
   // Desktop Layout Components (original)
   const Layout1Content = () => (
     <>
-      {paymentOption && (
+      {/* {paymentOption && (
         <div className="flex items-center gap-5">
           <span
             className="inline-block rounded-[48.28px] px-7 py-2.5 text-[14px] font-bold"
@@ -178,7 +178,7 @@ const handleAddToCart = async () => {
             </span>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-2">
@@ -220,7 +220,7 @@ const handleAddToCart = async () => {
         )}
       </div>
 
-      {paymentOption && (
+      {/* {paymentOption && (
         <div className="flex items-center gap-5">
           <span
             className="inline-block rounded-[48.28px] px-7 py-2.5 text-[14px] font-bold"
@@ -235,7 +235,7 @@ const handleAddToCart = async () => {
             </span>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 
