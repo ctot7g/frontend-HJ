@@ -132,7 +132,7 @@ function InstallmentsContent() {
                   <button
                     key={pct}
                     onClick={() => setDepositPct(pct)}
-                    className={`flex flex-col items-center justify-center border-2 px-2 py-3 text-center transition-all ${
+                    className={`flex flex-col items-center justify-center border-2 cursor-pointer px-2 py-3 text-center transition-all ${
                       active
                         ? "border-[#3d1a6e] bg-[#3d1a6e] text-white"
                         : "border-gray-200 bg-white text-gray-700 hover:border-[#3d1a6e] hover:bg-purple-50"
@@ -162,7 +162,7 @@ function InstallmentsContent() {
                   <button
                     key={t}
                     onClick={() => setTerm(t)}
-                    className={`flex flex-col items-center justify-center border-2 px-2 py-3 text-center transition-all ${
+                    className={`flex flex-col items-center justify-center cursor-pointer border-2 px-2 py-3 text-center transition-all ${
                       active
                         ? "border-[#3d1a6e] bg-[#3d1a6e] text-white"
                         : "border-gray-200 bg-white text-gray-700 hover:border-[#3d1a6e] hover:bg-purple-50"

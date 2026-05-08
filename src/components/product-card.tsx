@@ -157,15 +157,9 @@ const handleAddToCart = async () => {
   // Desktop Layout Components (original)
   const Layout1Content = () => (
     <>
-      {/* Installment line — 36 months */}
-      {/* {showInstallments && (
-        <div className="text-sm text-gray-500">
-          From £{(price / 36).toFixed(2)}/month over 36 months
-        </div>
-      )} */}
 
-      <div className="lg:text-[20px] text-gray-500">
-        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : '\u00A0'}
+      <div style={{ height: '32px', display: 'flex', alignItems: 'center', borderBottom: showInstallments ? '2px solid #2563eb' : '2px solid transparent' }} className="lg:text-[20px] text-gray-500">
+        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : ''}
       </div>
 
       <div className="flex items-center justify-between">
@@ -188,8 +182,14 @@ const handleAddToCart = async () => {
     </>
   );
 
+
   const Layout2Content = () => (
     <>
+
+      <div style={{ height: '32px', display: 'flex', alignItems: 'center', borderBottom: showInstallments ? '2px solid #2563eb' : '2px solid transparent' }} className="lg:text-[20px] text-gray-500">
+        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : ''}
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-2">
           <span className="text-[#999999] lg:text-[20px]">
@@ -206,17 +206,6 @@ const handleAddToCart = async () => {
             {deliveryInfo}
           </span>
         )}
-      </div>
-
-      {/* Installment line — 36 months */}
-      {/* {showInstallments && (
-        <div className="text-sm text-gray-500">
-          From £{(price / 36).toFixed(2)}/month over 36 months
-        </div>
-      )} */}
-
-      <div className="lg:text-[20px] text-gray-500">
-        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : '\u00A0'}
       </div>
     </>
   );
