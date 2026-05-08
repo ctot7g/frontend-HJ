@@ -34,6 +34,7 @@ interface ProductCardProps {
   color?: string;
   stock?: number;
   assemble_charges: number;
+  showInstallments?: boolean;
 }
 
 export function ProductCard({
@@ -53,6 +54,7 @@ export function ProductCard({
   color,
   stock,
   assemble_charges,
+  showInstallments = true,
 }: ProductCardProps) {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -124,23 +126,15 @@ const handleAddToCart = async () => {
         )}
       </div>
 
-      {/* 3. Klarna Payment Option (always after prices) */}
-      {/* {paymentOption && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span
-              className="inline-block rounded px-2 py-1 text-xs font-bold"
-              style={{ backgroundColor: "#FFA8CD", color: "#222222" }}
-            >
-              {paymentOption.service}
-            </span>
-          </div>
-          <div className="text-xs text-gray-600">
-            Make {paymentOption.installments} payments of £
-            {formatPrice(paymentOption.amount)}
-          </div>
+      {/* {showInstallments && (
+        <div className="text-xs text-gray-600">
+          From £{(price / 36).toFixed(2)}/month over 36 months
         </div>
       )} */}
+
+      <div className="text-xs text-gray-600">
+        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : '\u00A0'}
+      </div>
 
       {/* 4. Add to Cart Button */}
       <button
@@ -163,22 +157,16 @@ const handleAddToCart = async () => {
   // Desktop Layout Components (original)
   const Layout1Content = () => (
     <>
-      {/* {paymentOption && (
-        <div className="flex items-center gap-5">
-          <span
-            className="inline-block rounded-[48.28px] px-7 py-2.5 text-[14px] font-bold"
-            style={{ backgroundColor: "#FFA8CD", color: "var(--dark-gray)" }}
-          >
-            {paymentOption.service}
-          </span>
-          <div>
-            <span className="text-gray lg:text-[20px]">
-              Make {paymentOption.installments} Payments Of <br />£
-              {formatPrice(paymentOption.amount)}
-            </span>
-          </div>
+      {/* Installment line — 36 months */}
+      {/* {showInstallments && (
+        <div className="text-sm text-gray-500">
+          From £{(price / 36).toFixed(2)}/month over 36 months
         </div>
       )} */}
+
+      <div className="lg:text-[20px] text-gray-500">
+        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : '\u00A0'}
+      </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-2">
@@ -220,22 +208,16 @@ const handleAddToCart = async () => {
         )}
       </div>
 
-      {/* {paymentOption && (
-        <div className="flex items-center gap-5">
-          <span
-            className="inline-block rounded-[48.28px] px-7 py-2.5 text-[14px] font-bold"
-            style={{ backgroundColor: "#FFA8CD", color: "#222222" }}
-          >
-            {paymentOption.service}
-          </span>
-          <div>
-            <span className="text-[#999999] lg:text-[20px]">
-              Make {paymentOption.installments} Payments Of <br />£
-              {formatPrice(paymentOption.amount)}
-            </span>
-          </div>
+      {/* Installment line — 36 months */}
+      {/* {showInstallments && (
+        <div className="text-sm text-gray-500">
+          From £{(price / 36).toFixed(2)}/month over 36 months
         </div>
       )} */}
+
+      <div className="lg:text-[20px] text-gray-500">
+        {showInstallments ? `From £${(price / 36).toFixed(2)}/month over 36 months` : '\u00A0'}
+      </div>
     </>
   );
 

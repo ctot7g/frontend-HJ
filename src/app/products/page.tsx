@@ -50,6 +50,7 @@ interface PageProduct {
   color?: string;
   stock?: number;
   assemble_charges: number;
+  showInstallments?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -169,6 +170,7 @@ const buildPageProduct = (
     color: selectedVariant?.color,
     stock: selectedVariant?.stock,
     assemble_charges: selectedVariant?.assemble_charges ?? 0,
+    showInstallments: product.show_installments ?? true,
   };
 };
 
@@ -499,6 +501,7 @@ function ProductsContent() {
                   color={product.color}
                   stock={product.stock}
                   assemble_charges={product.assemble_charges ?? 0}
+                  showInstallments={product.showInstallments}
                 />
               ))}
             </div>

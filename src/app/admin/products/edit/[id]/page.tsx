@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,7 @@ const basicInfoSchema = z.object({
       free_shipping_threshold: z.coerce.number().optional(),
     })
     .optional(),
+  show_installments: z.boolean().optional(),
 });
 
 type BasicInfoFormValues = z.infer<typeof basicInfoSchema>;
@@ -162,6 +164,7 @@ export default function EditProductPage() {
         shipping_method: "",
         free_shipping_threshold: 0,
       },
+      show_installments: true,
     },
   });
 
@@ -186,6 +189,7 @@ export default function EditProductPage() {
           shipping_method: "",
           free_shipping_threshold: 0,
         },
+        show_installments: product.show_installments ?? true,
       });
     }
   }, [product, form]);
@@ -206,6 +210,7 @@ export default function EditProductPage() {
         assembly_instructions: values.assembly_instructions || undefined,
         delivery_info: values.delivery_info,
         related_product_ids: relatedProductIds,
+        show_installments: values.show_installments ?? true,
       };
 
       // Use the mutation
@@ -394,6 +399,29 @@ export default function EditProductPage() {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+  control={form.control}
+  name="show_installments"
+  render={({ field }) => (
+    <FormItem className="flex flex-row items-start space-y-0 space-x-3 border p-4">
+      <FormControl>
+        <Checkbox
+          checked={field.value}
+          onCheckedChange={field.onChange}
+          className="cursor-pointer"
+        />
+      </FormControl>
+      <div className="space-y-1 leading-none">
+        <FormLabel>Show Installments</FormLabel>
+        <FormDescription>
+          Whether its installments needs to be visible or not.
+        </FormDescription>
+      </div>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
                     <FormField
                       control={form.control}

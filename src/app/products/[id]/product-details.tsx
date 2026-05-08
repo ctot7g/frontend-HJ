@@ -1219,6 +1219,14 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                 Make 3 Payments Of £{(currentDiscountedPrice / 3).toFixed(2)}
               </span>
             </div> */}
+{/* Installment line — 36 months */}
+{(product.show_installments ?? true) && (
+  <div className="mt-3">
+    <span className="text-[16px] text-[#999] md:text-[18px] lg:text-[20px]">
+      From £{(currentDiscountedPrice / 36).toFixed(2)}/month over 36 months
+    </span>
+  </div>
+)}
 
             {/* Description */}
             <div className="space-y-1">
@@ -1651,19 +1659,21 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                             discount={discountLabel}
                             imageSrc={productImage}
                             rating={4.9}
-                            paymentOption={
-                              hasPaymentOptions(selectedVariantData)
-                                ? {
-                                    service: selectedVariantData.payment_options[0].provider || "Klarna",
-                                    installments: selectedVariantData.payment_options[0].installments || 3,
-                                    amount: selectedVariantData.payment_options[0].amount || Math.round((finalPrice / 3) * 100) / 100,
-                                  }
-                                : { service: "Klarna", installments: 3, amount: Math.round((finalPrice / 3) * 100) / 100 }
-                            }
+                            // paymentOption={
+                            //   hasPaymentOptions(selectedVariantData)
+                            //     ? {
+                            //         service: selectedVariantData.payment_options[0].provider || "Klarna",
+                            //         installments: selectedVariantData.payment_options[0].installments || 3,
+                            //         amount: selectedVariantData.payment_options[0].amount || Math.round((finalPrice / 3) * 100) / 100,
+                            //       }
+                            //     : { service: "Klarna", installments: 3, amount: Math.round((finalPrice / 3) * 100) / 100 }
+                            // }
+                            paymentOption={undefined}
                             isSale={hasDiscount}
                             deliveryInfo={deliverInfo}
                             assemble_charges={assembleCharges}
                             variantId={firstVariant?.id}
+                            showInstallments={rp.show_installments ?? true}
                           />
                         );
                       })}
@@ -1691,19 +1701,21 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                             discount={discountLabel}
                             imageSrc={productImage}
                             rating={4.9}
-                            paymentOption={
-                              hasPaymentOptions(selectedVariantData)
-                                ? {
-                                    service: selectedVariantData.payment_options[0].provider || "Klarna",
-                                    installments: selectedVariantData.payment_options[0].installments || 3,
-                                    amount: selectedVariantData.payment_options[0].amount || Math.round((finalPrice / 3) * 100) / 100,
-                                  }
-                                : { service: "Klarna", installments: 3, amount: Math.round((finalPrice / 3) * 100) / 100 }
-                            }
+                            // paymentOption={
+                            //   hasPaymentOptions(selectedVariantData)
+                            //     ? {
+                            //         service: selectedVariantData.payment_options[0].provider || "Klarna",
+                            //         installments: selectedVariantData.payment_options[0].installments || 3,
+                            //         amount: selectedVariantData.payment_options[0].amount || Math.round((finalPrice / 3) * 100) / 100,
+                            //       }
+                            //     : { service: "Klarna", installments: 3, amount: Math.round((finalPrice / 3) * 100) / 100 }
+                            // }
+                            paymentOption={undefined}
                             isSale={hasDiscount}
                             deliveryInfo={deliverInfo}
                             assemble_charges={assembleCharges}
                             variantId={firstVariant?.id}
+                            showInstallments={rp.show_installments ?? true}
                           />
                         );
                       })}

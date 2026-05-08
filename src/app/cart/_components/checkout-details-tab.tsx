@@ -434,7 +434,7 @@ const handlePayInInstallments = () => {
                 )}
               </div>
             </div>
-            {/* ✅ Payment buttons appear below card after Place Order clicked */}
+            {/* Payment buttons appear below card after Place Order clicked */}
             {showPaymentChoice && (
               <div className="mt-4 flex flex-col gap-3">
                 <Button

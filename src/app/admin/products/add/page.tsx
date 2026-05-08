@@ -125,6 +125,7 @@ default_seat_cushion_info: z.string().optional(),
 default_back_support_info: z.string().optional(),
 default_back_cushion_info: z.string().optional(),
 default_feet_info: z.string().optional(),
+show_installments: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -202,6 +203,7 @@ export default function AddProductPage() {
       default_back_support_info: "",
       default_back_cushion_info: "",
       default_feet_info: "",
+      show_installments: true,
     },
   });
 
@@ -355,6 +357,7 @@ export default function AddProductPage() {
   back_support_info: values.default_back_support_info || undefined,
   back_cushion_info: values.default_back_cushion_info || undefined,
   feet_info: values.default_feet_info || undefined,
+  show_installments: values.show_installments ?? true,
 },
       };
 
@@ -638,6 +641,28 @@ export default function AddProductPage() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+  control={form.control}
+  name="show_installments"
+  render={({ field }) => (
+    <FormItem className="flex flex-row items-start space-y-0 space-x-3 border p-4">
+      <FormControl>
+        <Checkbox
+          checked={field.value}
+          onCheckedChange={field.onChange}
+          className="cursor-pointer"
+        />
+      </FormControl>
+      <div className="space-y-1 leading-none">
+        <FormLabel>Show Installments</FormLabel>
+        <FormDescription>
+          Whether its installments needs to be visible or not.
+        </FormDescription>
+      </div>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
                   </div>
 
                   <FormField
