@@ -20,12 +20,67 @@ export default function LoanApprovedPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  const handleOrderData = (data: any) => {
+  if (data.status !== 'loan_approved') {
+    setOrder(null);
+    return;
+  }
+
+  setOrder(data);
+
+  const calculatedTotal =
+    data.total_amount +
+    (data.floor?.charges || 0) +
+    (data.zone?.delivery_charges || 0) -
+    (data.discount_amount || 0);
+
+  if (data.deposit_amount && data.deposit_amount > 0) {
+    setDepositAmount(data.deposit_amount);
+  } else {
+    const pctToUse = data.admin_deposit_percentage || data.deposit_percentage || 10;
+    setDepositAmount((calculatedTotal * pctToUse) / 100);
+  }
+
+  if (data.admin_deposit_percentage) {
+    setDepositPct(data.admin_deposit_percentage);
+  } else if (data.deposit_percentage) {
+    setDepositPct(data.deposit_percentage);
+  }
+
+  if (data.admin_installment_term) {
+    setInstallmentTerm(data.admin_installment_term);
+  } else if (data.installment_term) {
+    setInstallmentTerm(data.installment_term);
+  }
+};
+
+  // useEffect(() => {
+  //   const fetchOrder = async () => {
+  //     try {
+  //       const res = await ApiService.fetchWithAuth(`/orders/${orderId}`);
+  //       if (res.status === 401 || res.status === 403) {
+  //         window.location.href = `/login?redirect=/loan-approved/${orderId}`;
+  //         return;
+  //       }
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        // ✅ Try with auth first, but don't redirect guests to login
         const res = await ApiService.fetchWithAuth(`/orders/${orderId}`);
         if (res.status === 401 || res.status === 403) {
-          window.location.href = `/login?redirect=/loan-approved/${orderId}`;
+          // guest — try without auth
+          const guestRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`
+          );
+          if (!guestRes.ok) {
+            setOrder(null);
+            setLoading(false);
+            return;
+          }
+          const data = await guestRes.json();
+          // process same as below
+          handleOrderData(data);
+          setLoading(false);
           return;
         }
         if (res.ok) {
@@ -85,15 +140,14 @@ export default function LoanApprovedPage() {
 
     try {
       // Create a NEW payment request for deposit amount only
-      const res = await ApiService.fetchWithAuth(
-        `/orders/${orderId}/deposit-payment`,
-        { method: "POST" }
+      // ✅ Deposit endpoint is now public — no auth needed
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/deposit-payment`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
       );
-
-      if (res.status === 401 || res.status === 403) {
-        window.location.href = `/login?redirect=/loan-approved/${orderId}`;
-        return;
-      }
 
       if (!res.ok) {
         const err = await res.json();
