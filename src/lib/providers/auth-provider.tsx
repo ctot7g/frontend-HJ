@@ -6,7 +6,7 @@ import { AuthApiService } from "@/lib/services/auth-api";
 import { SessionManager } from "@/lib/services/session-manager";
 import { AuthUserResponse, AuthError, StoredSession } from "@/lib/types/auth";
 import { supabase } from "../supabase";
-import { useCart } from "../store/cart-store";
+import { useCart, useCartStore } from "../store/cart-store";
 
 type AuthContextType = {
   user: AuthUserResponse | null;
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
-  const { syncCartWithServerAfterLogin, clearCart } = useCart();
+  const { syncCartWithServerAfterLogin, syncWithServer, clearCart } = useCart();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -63,8 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(storedSession);
             setUser(currentUser);
 
-            // Sync guest cart with server after login
-            await syncCartWithServerAfterLogin();
+            // ✅ On page load: just sync FROM server, don't push local items
+        // Local items from localStorage may already be server items
+        // (populated by a previous syncWithServer call)
+        await syncWithServer();
 
             // Refresh queries when auth state changes
             queryClient.invalidateQueries({ queryKey: ["user-profile"] });
@@ -98,6 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setSession(newSession);
       setUser(response.user);
+
+      // ✅ Sync guest cart items to server immediately after login
+      await syncCartWithServerAfterLogin();
 
       // Refresh queries when auth state changes
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });

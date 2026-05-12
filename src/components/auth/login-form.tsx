@@ -15,7 +15,6 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSocialLogin = async (strategy: "google" | "facebook") => {
@@ -50,18 +49,13 @@ const LoginPage = () => {
       const loginSource = localStorage.getItem("loginSource");
 
       // Small delay for smooth transition
-      setTimeout(() => {
-        if (redirectUrl && loginSource === "cart-checkout") {
-          // Redirect back to cart with step parameter
-          router.push(redirectUrl);
-        } else if (redirectUrl) {
-          // General redirect
-          router.push(redirectUrl);
-        } else {
-          // Default redirect to home
-          router.push("/");
-        }
-      }, 500);
+      if (redirectUrl && loginSource === "cart-checkout") {
+        router.push(redirectUrl);
+      } else if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/");
+      }
     } catch {
       toast.error("Failed to log in");
     } finally {

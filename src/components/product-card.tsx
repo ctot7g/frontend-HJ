@@ -247,22 +247,10 @@ const handleAddToCart = async () => {
       )}
     </div> */}
     <div className="flex items-center justify-between gap-2" style={{ height: '40px' }}>
-      {/* Left: Installment */}
-      {showInstallments && (
-        <div className="text-[14px] text-gray-500 flex-1">
-          {`Finance from £${((price * 0.90) / 36).toFixed(2)}/month over 36 months`}
-        </div>
-      )}
-
-      {/* Vertical Divider */}
-      {showInstallments && (
-        <div style={{ width: '2px', height: '100%', backgroundColor: '#2563eb', flexShrink: 0 }} />
-      )}
-
-      {/* Right: Price + Delivery */}
+      {/* Left: price */}
       <div className={`flex items-center gap-2 ${!showInstallments ? 'w-full justify-between' : 'flex-shrink-0'}`}>
         <div className="flex items-baseline gap-1">
-          <span className="text-[#999999] lg:text-[20px]">
+          <span className="font-bold lg:text-[20px]">
             £{formatPrice(price)}
           </span>
           {originalPrice && originalPrice > price && (
@@ -277,6 +265,19 @@ const handleAddToCart = async () => {
           </span>
         )}
       </div>
+
+
+      {/* Vertical Divider */}
+      {showInstallments && (
+        <div style={{ width: '2px', height: '100%', backgroundColor: '#2563eb', flexShrink: 0 }} />
+      )}
+
+      {/* Right: installment line */}
+      {showInstallments && (
+        <div className="text-[14px] text-gray-500 font-semibold flex-1">
+          {`Finance from £${((price * 0.90) / 36).toFixed(2)}/month over 36 months`}
+        </div>
+      )}
     </div>
 
     {/* Add to Cart Button */}

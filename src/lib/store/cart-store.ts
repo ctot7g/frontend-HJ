@@ -452,41 +452,48 @@ export const useCartStore = create<CartState>()(
       },
 
       syncCartWithServerAfterLogin: async () => {
-        console.log("Syncing guest cart with server after login...");
         const { items, clearCartLocally, syncWithServer, setLoading } = get();
+        const guestItems = items.filter(
+          (i) => i.id === i.variant_id && i.delivery_time_days !== "Bundle"
+        );
+        const bundleItems = items.filter((i) => i.delivery_time_days === "Bundle");
+
+        // Nothing to push — just fetch the authoritative server cart
+        if (guestItems.length === 0) {
+          await syncWithServer();
+          return;
+        }
 
         try {
           setLoading(true);
-          const currentAuthStatus = await get().checkAuthStatus();
-          if (currentAuthStatus) {
-            const syncableItems = items.filter(
-              (i) => i.delivery_time_days !== "Bundle"
-            );
+          const currentAuthStatus = get().checkAuthStatus();
+          if (!currentAuthStatus) return;
 
-            await CartApiService.syncCartAfterLogin({
-              data: syncableItems.map((i) => ({
-                variant_id: i.variant_id,
-                quantity: i.quantity,
-                assembly_required: i.assembly_required,
-              })),
-            });
+          // Push guest items to server first
+          await CartApiService.syncCartAfterLogin({
+            data: guestItems.map((i) => ({
+            variant_id: i.variant_id,
+            quantity: i.quantity,
+            assembly_required: i.assembly_required,
+          })),
+        });
 
-            clearCartLocally();
-            await syncWithServer();
+        // Clear local state only AFTER server confirms success
+        clearCartLocally();
 
-            const bundleItems = items.filter(
-              (i) => i.delivery_time_days === "Bundle"
-            );
-            bundleItems.forEach((bundle) => {
-              get().addItemLocally(bundle);
-            });
-          }
-        } catch (error) {
-          console.error("Failed to sync guest cart after login:", error);
-        } finally {
-          setLoading(false);
-        }
-      },
+        // Re-add bundle items (local-only)
+        bundleItems.forEach((bundle) => get().addItemLocally(bundle));
+
+        // Fetch the authoritative merged cart from server
+        await syncWithServer();
+
+      } catch (error) {
+        console.error("Failed to sync guest cart after login:", error);
+        // Don't clear local items if sync failed
+      } finally {
+        setLoading(false);
+      }
+    },
 
       addItemLocally: (item) => {
         set((state) => {
