@@ -265,7 +265,7 @@ export const ShoppingCartTab = ({
                 size="md"
                 rounded="full"
                 disabled={items.length === 0}
-                className="relative mt-2 h-12! w-full items-center text-left! shadow-lg text-[18px]"
+                className="relative mt-2 h-12! w-full items-center text-left! shadow-lg text-[14px]"
                 icon={
                   <Image
                     src="/arrow-right.png"
