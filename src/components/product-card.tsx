@@ -281,7 +281,7 @@ const handleAddToCart = async () => {
                 </span>
                 <span className="text-xs text-gray-400">0% APR - 10% deposit.</span>
             </div>
-        </>
+          </>
         ) : (
           <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
             {!showInstallments && (
