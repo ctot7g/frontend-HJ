@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 // import "@/components/ui/modern-image-gallery.css";
 import { useProduct, useRelatedProducts } from "@/hooks/use-products";
 import { useCartAnimationStore, useCartStore } from "@/lib/store/cart-store";
@@ -17,7 +18,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ChevronRight, Package, ChevronLeft, BadgePoundSterling, Calculator } from "lucide-react";
+import { ChevronRight, Package, ChevronLeft, BadgePoundSterling, Calculator, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product-card";
@@ -138,6 +139,7 @@ const getVariantDiscount = (
   }
   return 0;
 };
+
 
 // Returns the "was" / original price to show as strikethrough.
 const getOriginalPrice = (variant: any, fallbackPrice: number): number => {
@@ -325,6 +327,8 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
 
   const addItem = useCartStore((state) => state.addItem);
   const { isInWishlist, toggleItem } = useWishlistStore();
+
+  const router = useRouter()
 
   // ── scroll spy ────────────────────────────────────────────────
   useEffect(() => {
@@ -1238,6 +1242,15 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                       finance calculator
                     </span>
                   </button>
+                </div>
+
+                <div>
+                  <p
+                    onClick={() => router.push('/klarna-terms')}
+                    className="text-sm text-purple-800 md:text-base mt-6 font-bold underline flex items-center gap-2 cursor-pointer"
+                  >
+                    <WalletCards className="w-5 h-5" color="#7C079C" /> Check your financial eligibility
+                  </p>
                 </div>
               </div>
             )}
