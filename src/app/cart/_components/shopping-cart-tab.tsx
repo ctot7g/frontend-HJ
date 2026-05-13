@@ -177,7 +177,7 @@ export const ShoppingCartTab = ({
             <div className="mb-2 text-lg text-gray-500">Total Price</div>
 
             {/* Big Total Price */}
-            <div className="mb-1 text-4xl font-extrabold text-gray-900">
+            <div className="mb-1 text-4xl font-bold text-gray-900">
               £{finalTotal.toFixed(2)}
             </div>
 
@@ -188,7 +188,7 @@ export const ShoppingCartTab = ({
               </div>
             )}
             {hasInstallments && (
-              <div className="mt-1 text-3xl font-extrabold text-gray-800">
+              <div className="mt-1 text-3xl font-bold text-gray-800">
                 £{((finalTotal * 0.90) / 36).toFixed(2)}{" "}
                 <span className="text-base font-normal text-gray-500">a month</span>
               </div>
