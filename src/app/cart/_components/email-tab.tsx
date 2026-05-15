@@ -13,6 +13,7 @@ import { SummaryLineItem, SummaryTotalLineItem } from "./cart-summary";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
+
 interface EmailTabProps {
   onNext: () => void;
   formData: FormData;
@@ -44,7 +45,7 @@ export const EmailTab = ({
   couponProps,
 }: EmailTabProps) => {
   const { user } = useAuth();
-  const { subtotal, assemblyTotal, getCartTotal } = useCart();
+  const { items, subtotal, assemblyTotal, getCartTotal } = useCart();
 
   const [showGuestOptions, setShowGuestOptions] = React.useState(
     !user && !formData.isGuest
@@ -299,8 +300,20 @@ export const EmailTab = ({
                 {useWallet && walletDiscount > 0 && (
                   <SummaryLineItem label="Wallet Credit" value={-walletDiscount} />
                 )}
-
-                <SummaryTotalLineItem label="Total" value={finalTotal} />
+                
+                <div className="flex flex-col items-center border-t border-gray-300 pt-2 text-lg font-bold sm:flex-row sm:justify-between">
+                  <span className="flex flex-col">
+                    <span>Total</span>
+                    {items.every((item) => item.show_installments !== false) && (
+                      <span className="text-lg font-bold">
+                        (£{(parseFloat(((finalTotal * 0.90) / 36).toFixed(10))).toFixed(2)}/month - 10% deposit)
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-extrabold text-2xl sm:text-lg sm:font-bold">
+                    £{finalTotal.toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

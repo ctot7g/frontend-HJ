@@ -73,7 +73,7 @@ function CartPageContent() {
     return <CartError cartError={cartError} />;
   }
 
-  if (totalItems === 0 && currentStep === 1) {
+  if (totalItems === 0 && (currentStep === 1 || currentStep === 2 || currentStep === 3)) {
     return <EmptyCart />;
   }
 

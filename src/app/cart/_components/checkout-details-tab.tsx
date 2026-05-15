@@ -56,42 +56,42 @@ interface PaymentMethodStepProps {
   onBack: () => void;
 }
 
-const PaymentMethodStep = ({
-  grandTotal,
-  onPayWithCard,
-  onPayInInstallments,
-  onBack,
-}: PaymentMethodStepProps) => (
-  <div className="flex flex-col gap-3">
-    <Button
-      onClick={onPayWithCard}
-      variant="primary"
-      size="xl"
-      rounded="full"
-      className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
-    >
-      Pay by Card
-    </Button>
+// const PaymentMethodStep = ({
+//   grandTotal,
+//   onPayWithCard,
+//   onPayInInstallments,
+//   onBack,
+// }: PaymentMethodStepProps) => (
+//   <div className="flex flex-col gap-3">
+//     <Button
+//       onClick={onPayWithCard}
+//       variant="primary"
+//       size="xl"
+//       rounded="full"
+//       className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
+//     >
+//       Pay by Card
+//     </Button>
 
-    <Button
-      onClick={onPayInInstallments}
-      variant="primary"
-      size="xl"
-      rounded="full"
-      className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
-    >
-      Spread the Cost
-    </Button>
+//     <Button
+//       onClick={onPayInInstallments}
+//       variant="primary"
+//       size="xl"
+//       rounded="full"
+//       className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
+//     >
+//       Spread the Cost
+//     </Button>
 
-    <button
-      onClick={onBack}
-      className="mt-2 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
-    >
-      <ChevronLeft size={14} />
-      Back to details
-    </button>
-  </div>
-);
+//     <button
+//       onClick={onBack}
+//       className="mt-2 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
+//     >
+//       <ChevronLeft size={14} />
+//       Back to details
+//     </button>
+//   </div>
+// );
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const CheckoutDetailsTab = ({
@@ -110,7 +110,7 @@ export const CheckoutDetailsTab = ({
   showInstallmentsButton = true,
 }: CheckoutDetailsTabProps) => {
   const { user } = useAuth();
-  const { assemblyTotal, subtotal, getCartTotal } = useCart();
+  const { items, assemblyTotal, subtotal, getCartTotal } = useCart();
   const router = useRouter();
 
   const {
@@ -410,7 +410,19 @@ const handlePayInInstallments = () => {
                   <SummaryLineItem label="Wallet Credit" value={-walletDiscount} />
                 )}
 
-                <SummaryTotalLineItem label="Grand Total" value={grandTotal} />
+                <div className="flex flex-col items-center border-t border-gray-300 pt-2 text-lg font-bold sm:flex-row sm:justify-between">
+                  <span className="flex flex-col">
+                    <span>Grand Total</span>
+                    {items.every((item) => item.show_installments !== false) && (
+                      <span className="text-lg font-bold">
+                        (£{(parseFloat(((grandTotal * 0.90) / 36).toFixed(10))).toFixed(2)}/month - 10% deposit)
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-extrabold text-2xl sm:text-lg sm:font-bold">
+                    £{grandTotal.toFixed(2)}
+                  </span>
+                </div>
 
                 {(discountAmount > 0 || referralDiscount > 0 || walletDiscount > 0) && (
                   <p className="text-right text-xs text-green-600">
