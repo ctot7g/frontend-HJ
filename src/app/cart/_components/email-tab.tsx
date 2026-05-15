@@ -297,7 +297,7 @@ export const EmailTab = ({
 
                 {/* Total block — matches step 1 style */}
                 <div className="border-t border-gray-300 pt-4 text-center">
-                  <div className="text-lg text-gray-500">Total Price</div>
+                  <div className="text-lg mb-4 text-gray-500">Total Price</div>
                   <div className="text-4xl font-bold text-gray-900">£{finalTotal.toFixed(2)}</div>
                   {items.every((item) => item.show_installments !== false) && (
                     <>
