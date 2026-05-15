@@ -122,7 +122,7 @@ export const CheckoutDetailsTab = ({
   const [localCouponCode, setLocalCouponCode] = React.useState("");
 
   // NEW: tracks whether we're showing payment method choice
-  const [showPaymentChoice, setShowPaymentChoice] = React.useState(false);
+  // const [showPaymentChoice, setShowPaymentChoice] = React.useState(false);
 
   const floorsQuery = useFloors();
   const deliveryChargesByZipCode = useDeliveryChargesByZipCode();
@@ -164,20 +164,20 @@ export const CheckoutDetailsTab = ({
   );
 
   // ── "Place Order" clicked → show payment method picker ──────────────────────
-  const handlePlaceOrderClick = () => {
-    setShowPaymentChoice(true);
-  };
+  // const handlePlaceOrderClick = () => {
+  //   setShowPaymentChoice(true);
+  // };
 
   const depositAmount = parseFloat((grandTotal * 0.1).toFixed(2));
 
   const handlePayWithCard = () => {
-    setShowPaymentChoice(false);
+    // setShowPaymentChoice(false);
     setFormData({ ...formData, paymentMethod: "card" });
     onPlaceOrder();
   };
 
 const handlePayInInstallments = () => {
-  setShowPaymentChoice(false);
+  // setShowPaymentChoice(false);
   onPlaceOrder({ grandTotal, floorCharge, zonalCharges, depositAmount }, "installments");
 };
 
@@ -270,42 +270,6 @@ const handlePayInInstallments = () => {
               </div>
             </div>
 
-            {/* ── Payment Method Step (replaces button when clicked) ── */}
-            {/* {showPaymentChoice ? (
-              <PaymentMethodStep
-                grandTotal={grandTotal}
-                onPayWithCard={handlePayWithCard}
-                onPayInInstallments={handlePayInInstallments}
-                onBack={() => setShowPaymentChoice(false)}
-              />
-            ) : (
-              <div className="flex gap-4 text-center">
-                <Button
-                  onClick={handlePlaceOrderClick}
-                  disabled={isProcessing}
-                  variant="primary"
-                  size="xl"
-                  rounded="full"
-                  className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isProcessing ? "Processing Payment..." : "Place Order"}
-                </Button>
-              </div>
-            )} */}
-            {!showPaymentChoice && (
-              <div className="flex gap-4 text-center">
-                <Button
-                  onClick={handlePlaceOrderClick}
-                  disabled={isProcessing}
-                  variant="primary"
-                  size="xl"
-                  rounded="full"
-                  className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isProcessing ? "Processing Payment..." : "Place Order"}
-                </Button>
-              </div>
-            )}
           </div>
 
           {/* Order Summary */}
@@ -404,12 +368,31 @@ const handlePayInInstallments = () => {
 
               {/* Price Breakdown */}
               <div className="mt-4 space-y-2">
-                <SummaryLineItem label="Products Total" value={subtotal} />
+                {/* <SummaryLineItem label="Products Total" value={subtotal} />
                 <SummaryLineItem label="Assembly Charges" value={assemblyTotal} />
                 <SummaryLineItem label="Subtotal" value={cartTotal} />
                 <hr className="my-2 border-t border-gray-300" />
                 <SummaryLineItem label="Floor Delivery Charges" value={floorCharge} />
-                <SummaryLineItem label="Shipping" value={zonalCharges} />
+                <SummaryLineItem label="Shipping" value={zonalCharges} /> */}
+
+                {/* TO */}
+                <SummaryLineItem label="Products Total" value={subtotal} />
+                {assemblyTotal > 0 && (
+                  <SummaryLineItem label="Assembly Charges" value={assemblyTotal} />
+                )}
+                {(assemblyTotal > 0 || floorCharge > 0 || zonalCharges > 0) && (
+                  <>
+                    {/* <SummaryLineItem label="Subtotal" value={cartTotal} /> */}
+                    <SummaryLineItem label="Subtotal" value={subtotalWithCharges} />
+                    <hr className="my-2 border-t border-gray-300" />
+                  </>
+                )}
+                {floorCharge > 0 && (
+                  <SummaryLineItem label="Floor Delivery Charges" value={floorCharge} />
+                )}
+                {zonalCharges > 0 && (
+                  <SummaryLineItem label="Shipping" value={zonalCharges} />
+                )}
 
                 {appliedCoupon && discountAmount > 0 && (
                   <SummaryLineItem
@@ -437,18 +420,19 @@ const handlePayInInstallments = () => {
               </div>
             </div>
             {/* Payment buttons appear below card after Place Order clicked */}
-            {/* {showPaymentChoice && (
-              <div className="mt-4 flex flex-col gap-3">
-                <Button
-                  onClick={handlePayWithCard}
-                  disabled={isProcessing}
-                  variant="primary"
-                  size="xl"
-                  rounded="full"
-                  className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isProcessing ? "Processing..." : "Pay in Full by Card"}
-                </Button>
+            <div className="mt-4 flex flex-col gap-3">
+              <Button
+                onClick={handlePayWithCard}
+                disabled={isProcessing}
+                variant="primary"
+                size="xl"
+                rounded="full"
+                className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isProcessing ? "Processing..." : "Pay in Full by Card"}
+              </Button>
+
+              {showInstallmentsButton && (
                 <Button
                   onClick={handlePayInInstallments}
                   disabled={isProcessing}
@@ -459,50 +443,8 @@ const handlePayInInstallments = () => {
                 >
                   Spread the Cost
                 </Button>
-                <button
-                  onClick={() => setShowPaymentChoice(false)}
-                  className="mt-1 cursor-pointer flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
-                >
-                  <ChevronLeft size={14} />
-                  Back to details
-                </button>
-              </div>
-            )} */}
-            {showPaymentChoice && (
-  <div className="mt-4 flex flex-col gap-3">
-    <Button
-      onClick={handlePayWithCard}
-      disabled={isProcessing}
-      variant="primary"
-      size="xl"
-      rounded="full"
-      className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {isProcessing ? "Processing..." : "Pay in Full by Card"}
-    </Button>
-
-    {showInstallmentsButton && (
-      <Button
-        onClick={handlePayInInstallments}
-        disabled={isProcessing}
-        variant="primary"
-        size="xl"
-        rounded="full"
-        className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Spread the Cost
-      </Button>
-    )}
-
-    <button
-      onClick={() => setShowPaymentChoice(false)}
-      className="mt-1 cursor-pointer flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
-    >
-      <ChevronLeft size={14} />
-      Back to details
-    </button>
-  </div>
-)}
+              )}
+            </div>
           </div>
         </div>
       )}

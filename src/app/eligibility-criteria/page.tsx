@@ -49,21 +49,11 @@ export default function EligibilityCriteria() {
           Sofa Deal by Aleena London Ltd does not provide financial advice. Customers must complete finance applications themselves through the official application system provided by Ideal4Finance.
         </p>
 
-        <h2 className="text-xl font-bold mt-8">Apply for Finance</h2>
-        <p>
-          To check your eligibility and apply online, please use the secure application link below:
-        </p>
-        <a
+        <a 
           href="https://ideal4finance.com/loan-apply/aleena?r=ob"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline break-all"
-        >
-          https://ideal4finance.com/loan-apply/aleena?r=ob
+          className="text-xl font-bold mt-8 underline">
+            Apply for Finance
         </a>
-        <p>
-          Please ensure that the purchase amount, selected deposit percentage, and repayment term entered in your finance application match the options selected during checkout on our website.
-        </p>
 
         {/* Video */}
         <div className="mt-10">

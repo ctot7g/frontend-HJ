@@ -567,6 +567,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
         color: selectedColor || currentVariant.color,
         assembly_required: false,
         assemble_charges: currentVariant.assemble_charges || 0,
+        show_installments: product.show_installments ?? true,
         variant: {
           color: selectedColor || currentVariant.color,
           size: selectedSize || currentVariant.size,
@@ -1228,13 +1229,13 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-[16px] md:text-[18px] lg:text-md flex items-center gap-3">
-                    <BadgePoundSterling className="w-5 h-5" color="#F5B727" /> Finance from £{(parseFloat(((currentDiscountedPrice * 0.90) / 36).toFixed(10))).toFixed(2)}/month over 36 months
+                    <BadgePoundSterling className="w-5 h-5" color="#F5B727" /> Finance from <span className="font-bold">£{(parseFloat(((currentDiscountedPrice * 0.90) / 36).toFixed(10))).toFixed(2)}/month</span> over 36 months
                   </span>
                 </div>
 
                 <div>
                   <button className="flex items-center gap-3 text-sm md:text-base">
-                    <Calculator className="w-5 h-5" color="#7C079C" /> Try our{" "}
+                    <Calculator className="w-5 h-5" color="#7C079C" /> Try our
                     <span
                       onClick={() => setShowFinanceModal(true)}
                       className="text-purple-800 cursor-pointer underline"
@@ -1249,7 +1250,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                     onClick={() => router.push('/eligibility-criteria')}
                     className="text-sm text-purple-800 md:text-base mt-6 font-bold underline flex items-center gap-2 cursor-pointer"
                   >
-                    <WalletCards className="w-5 h-5" color="#7C079C" /> Check your financial eligibility
+                    <WalletCards className="w-5 h-5" color="#7C079C" /> Check your finance eligibility
                   </p>
                 </div>
               </div>
