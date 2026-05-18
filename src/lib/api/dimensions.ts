@@ -6,6 +6,7 @@ export interface HeroSettings {
   width: number;
   height: number;
   label: string;
+  hero_text: string;
   updated_at: string;
 }
 
@@ -58,6 +59,18 @@ export const DimensionsApi = {
       method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to delete image");
+    return res.json();
+  },
+
+  updateHeroText: async (heroText: string): Promise<HeroSettings> => {
+    const res = await ApiService.fetchWithAuth("/dimensions/hero-text", {
+      method: "PATCH",
+      body: JSON.stringify({ hero_text: heroText }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to update hero text");
+    }
     return res.json();
   },
 };

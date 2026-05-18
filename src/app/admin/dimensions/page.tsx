@@ -30,6 +30,8 @@ export default function DimensionsPage() {
   const [width, setWidth] = useState(1200);
   const [height, setHeight] = useState(800);
   const [label, setLabel] = useState("Hero Image");
+  const [heroText, setHeroText] = useState('');
+  const [isSavingText, setIsSavingText] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +47,7 @@ export default function DimensionsPage() {
       setWidth(data.width);
       setHeight(data.height);
       setLabel(data.label);
+      setHeroText(data.hero_text || '');
       if (data.image_url) setPreviewUrl(data.image_url);
     } catch (err) {
       toast.error("Failed to load settings");
@@ -52,6 +55,19 @@ export default function DimensionsPage() {
       setIsLoading(false);
     }
   };
+
+  const handleSaveHeroText = async () => {
+  if (!heroText.trim()) { toast.error('Text cannot be empty'); return; }
+  setIsSavingText(true);
+  try {
+    await DimensionsApi.updateHeroText(heroText);
+    toast.success('Banner text saved!');
+  } catch (err: any) {
+    toast.error(err.message || 'Failed to save');
+  } finally {
+    setIsSavingText(false);
+  }
+};
 
   const handleFileSelect = async (file: File) => {
     if (!file) return;
@@ -131,7 +147,7 @@ export default function DimensionsPage() {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 text-[30px]">Hero Image Dimensions</h1>
+        <h1 className="text-2xl font-bold text-gray-900 text-[30px]">Hero Section</h1>
         <p className="mt-1 text-sm text-gray-500">
           Upload and manage the hero section image and its display dimensions.
         </p>
@@ -370,6 +386,24 @@ export default function DimensionsPage() {
             </p>
           )}
         </div>
+      </div>
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-3 text-base font-semibold text-gray-800">Banner Text</h2>
+        <textarea
+          value={heroText}
+          onChange={(e) => setHeroText(e.target.value)}
+          rows={5}
+          placeholder="Enter hero banner text..."
+          className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm leading-relaxed focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+        />
+        <button
+          onClick={handleSaveHeroText}
+          disabled={isSavingText}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+        >
+          {isSavingText ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+          {isSavingText ? 'Saving...' : 'Save Banner Text'}
+        </button>
       </div>
     </div>
   );
