@@ -75,7 +75,8 @@ function parseURLParameters(): { params: PaymentParams; errors: string[] } {
 
           // Extract known payment parameters
           params.approval_code = urlParams.get("approval_code") || undefined;
-          params.oid = urlParams.get("oid") || undefined;
+          // params.oid = urlParams.get("oid") || undefined;
+          params.oid = urlParams.get("oid") || urlParams.get("orderId") || undefined;
           params.refnumber = urlParams.get("refnumber") || undefined;
           params.status = urlParams.get("status") || undefined;
           params.txndate_processed =
@@ -179,29 +180,46 @@ function parseURLParameters(): { params: PaymentParams; errors: string[] } {
 }
 
 // Determine if payment was successful based on parameters
+// function isPaymentSuccessful(params: PaymentParams): boolean {
+//   // Check various success indicators
+//   if (params.status) {
+//     const status = params.status.toUpperCase();
+//     if (["APPROVED", "SUCCESS", "COMPLETED"].includes(status)) {
+//       return true;
+//     }
+//     if (["DECLINED", "FAILED", "CANCELLED", "ERROR"].includes(status)) {
+//       return false;
+//     }
+//   }
+
+//   // Check approval code (usually starts with 'Y' for approved)
+//   if (params.approval_code) {
+//     return params.approval_code.toUpperCase().startsWith("Y");
+//   }
+
+//   // If we have an order ID but no explicit failure, assume success
+//   if (params.oid && !params.fail_reason && !params.processor_response_code) {
+//     return true;
+//   }
+
+//   // Default to false if we can't determine
+//   return false;
+// }
+
 function isPaymentSuccessful(params: PaymentParams): boolean {
-  // Check various success indicators
+  // Backend redirects here with orderId = success
+  if (params.oid) return true;
+
   if (params.status) {
     const status = params.status.toUpperCase();
-    if (["APPROVED", "SUCCESS", "COMPLETED"].includes(status)) {
-      return true;
-    }
-    if (["DECLINED", "FAILED", "CANCELLED", "ERROR"].includes(status)) {
-      return false;
-    }
+    if (["APPROVED", "SUCCESS", "COMPLETED"].includes(status)) return true;
+    if (["DECLINED", "FAILED", "CANCELLED", "ERROR"].includes(status)) return false;
   }
 
-  // Check approval code (usually starts with 'Y' for approved)
   if (params.approval_code) {
     return params.approval_code.toUpperCase().startsWith("Y");
   }
 
-  // If we have an order ID but no explicit failure, assume success
-  if (params.oid && !params.fail_reason && !params.processor_response_code) {
-    return true;
-  }
-
-  // Default to false if we can't determine
   return false;
 }
 
