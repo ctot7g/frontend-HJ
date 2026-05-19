@@ -1,19 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { ChevronRight, Loader2, Search, PackageSearch } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loader2, Search, PackageSearch } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { ApiService } from "@/lib/api-service";
-import { useAuth } from "@/lib/providers/auth-provider";
 import { Order } from "@/lib/types/orders";
 import { OrderCard } from "@/app/orders/_components/order-card";
 
@@ -24,13 +16,19 @@ export default function TrackOrderPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchedValue, setSearchedValue] = useState("");
 
-  const { user } = useAuth();
+  const searchParams = useSearchParams();
 
-  const handleSearch = async () => {
-    const raw = trackingInput.trim();
-    if (!raw) return;
+  const performSearch = async (id: string) => {
+    const raw = id.trim();
 
-    // Normalise: strip leading "#", uppercase
+    // Require # prefix
+    if (!raw.startsWith("#")) {
+      setHasSearched(true);
+      setSearchedValue(raw);
+      setMatchedOrder(null);
+      return;
+    }
+
     const shortId = raw.replace(/^#/, "").trim().toUpperCase();
 
     if (shortId.length !== 8) {
@@ -46,9 +44,8 @@ export default function TrackOrderPage() {
     setMatchedOrder(null);
 
     try {
-      // Call the dedicated track endpoint — no need to fetch all orders
-      const response = await ApiService.fetchWithAuth(
-        `/orders/track/${shortId}`
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/track/${shortId}`
       );
 
       if (response.ok) {
@@ -62,6 +59,20 @@ export default function TrackOrderPage() {
     } finally {
       setIsSearching(false);
     }
+  };
+
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (id) {
+      setTrackingInput(id);
+      performSearch(id);
+    }
+  }, [searchParams]);
+
+  const handleSearch = async () => {
+    const raw = trackingInput.trim();
+    if (!raw) return;
+    await performSearch(raw);
   };
 
   return (
@@ -98,16 +109,6 @@ export default function TrackOrderPage() {
             )}
           </Button>
         </div>
-
-        {!user && (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Please{" "}
-            <Link href="/login" className="underline text-blue-600">
-              sign in
-            </Link>{" "}
-            to track your orders.
-          </p>
-        )}
       </div>
 
       {/* Results */}
@@ -135,7 +136,7 @@ export default function TrackOrderPage() {
                   &quot;{searchedValue}&quot;
                 </span>
                 .<br />
-                Use the Order ID shown on your orders page, e.g.{" "}
+                Use the Order ID shown on your confirmation email, e.g.{" "}
                 <span className="font-mono">#BED88F46</span>.
               </p>
             </div>

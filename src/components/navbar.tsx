@@ -364,16 +364,22 @@ export function Navbar() {
 
               <Link
                 href="/about-us"
-                className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222]"
+                className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222] whitespace-nowrap"
               >
                 About Us
               </Link>
 
               <Link
                 href="/contact-us"
-                className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222]"
+                className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222] whitespace-nowrap"
               >
                 Contact Us
+              </Link>
+              <Link
+                href="/trackorder"
+                className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222] whitespace-nowrap"
+              >
+                Track Order
               </Link>
             </nav>
 
@@ -548,14 +554,6 @@ export function Navbar() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/trackorder"
-                        className="font-open-sans w-full cursor-pointer"
-                      >
-                        Track Order
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
                         href="/wishlist"
                         className="font-open-sans w-full cursor-pointer"
                       >
@@ -587,7 +585,7 @@ export function Navbar() {
                 <div className="flex items-center gap-2">
                   <Link
                     href="/login"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1"
                     onClick={handleLoginClick}
                   >
                     <Image
@@ -860,6 +858,12 @@ export function Navbar() {
                       >
                         Contact Us
                       </Link>
+                      <Link
+                        href="/trackorder"
+                        className="font-open-sans text-gray hover:text-navy transition-colors hover:text-[#222222]"
+                      >
+                        Track Order
+                      </Link>
                     </div>
 
                     {user ? (
@@ -892,14 +896,6 @@ export function Navbar() {
                             onClick={() => setIsSheetOpen(false)}
                           >
                             My Orders
-                          </Link>
-                          {/* Track Order - indented under My Orders */}
-                          <Link
-                            href="/trackorder"
-                            className="font-open-sans flex items-center text-base"
-                            onClick={() => setIsSheetOpen(false)}
-                          >
-                            Track Order
                           </Link>
                           <Link
                             href="/wishlist"
