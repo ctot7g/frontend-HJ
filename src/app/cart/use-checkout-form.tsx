@@ -63,6 +63,11 @@ export function useCheckoutForm() {
       zipCode: "",
       floorId: "",
       differentBilling: false,
+      billingAddress: "",
+      billingCity: "",
+      billingState: "",
+      billingZipCode: "",
+      billingCountry: "GB",
       paymentMethod: "card",
     });
   }, []);
@@ -419,17 +424,17 @@ const handlePlaceOrder = async (installmentMeta?: {
           floor_id: formData.floorId,
         },
         use_different_billing_address: formData.differentBilling,
-        billing_address: formData.differentBilling
-          ? {
-              street_address: formData.address,
-              city: formData.city,
-              state: formData.state,
-              postal_code: formData.zipCode,
-              country: getCountryCode(formData.country),
-              country_name: getCountryName(getCountryCode(formData.country)),
-              floor_id: formData.floorId,
-            }
-          : undefined,
+        billing_address: formData.differentBilling ? 
+          {
+            street_address: formData.billingAddress || "",
+            city: formData.billingCity || "",
+            state: formData.billingState || "",
+            postal_code: formData.billingZipCode || "",
+            country: getCountryCode(formData.billingCountry || "GB"),
+            country_name: getCountryName(getCountryCode(formData.billingCountry || "GB")),
+            floor_id: formData.floorId,
+          }
+        : undefined,
         cart_items: convertCartItemsToPaymentFormat(items),
         coupon_code: appliedCoupon?.code,
         discount_amount: totalDiscount > 0 ? totalDiscount : 0,

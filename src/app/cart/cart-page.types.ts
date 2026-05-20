@@ -44,6 +44,11 @@ export interface FormData {
   zipCode: string;
   floorId: string;
   differentBilling: boolean;
+  billingAddress?: string;
+  billingCity?: string;
+  billingState?: string;
+  billingZipCode?: string;
+  billingCountry?: string;
   paymentMethod: "card" | "cod" | "installments";
   isGuest?: boolean;
   createAccount?: boolean;

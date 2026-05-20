@@ -56,43 +56,6 @@ interface PaymentMethodStepProps {
   onBack: () => void;
 }
 
-// const PaymentMethodStep = ({
-//   grandTotal,
-//   onPayWithCard,
-//   onPayInInstallments,
-//   onBack,
-// }: PaymentMethodStepProps) => (
-//   <div className="flex flex-col gap-3">
-//     <Button
-//       onClick={onPayWithCard}
-//       variant="primary"
-//       size="xl"
-//       rounded="full"
-//       className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
-//     >
-//       Pay by Card
-//     </Button>
-
-//     <Button
-//       onClick={onPayInInstallments}
-//       variant="primary"
-//       size="xl"
-//       rounded="full"
-//       className="bg-blue hover:bg-blue/90 relative mx-auto flex h-12! w-full items-center justify-center px-8 py-4 font-semibold text-white shadow-lg"
-//     >
-//       Spread the Cost
-//     </Button>
-
-//     <button
-//       onClick={onBack}
-//       className="mt-2 flex w-full items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600"
-//     >
-//       <ChevronLeft size={14} />
-//       Back to details
-//     </button>
-//   </div>
-// );
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const CheckoutDetailsTab = ({
   onNext,
@@ -267,9 +230,47 @@ const handlePayInInstallments = () => {
                     Use a different billing address (optional)
                   </Label>
                 </div>
+                {formData.differentBilling && (
+                  <div className="mt-4 space-y-4">
+                    <h1 className="mb-6 text-3xl text-[#222222] sm:text-[45px]">Billing Address</h1>
+                    <FormInputWithLabel
+                      label="STREET ADDRESS *"
+                      value={formData.billingAddress ?? ""}
+                      onChange={(e) => handleInputChange("billingAddress", e.target.value)}
+                    />
+                    <FormInputWithLabel
+                      label="TOWN / CITY *"
+                      value={formData.billingCity ?? ""}
+                      onChange={(e) => handleInputChange("billingCity", e.target.value)}
+                    />
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <FormInputWithLabel
+                        label="STATE / COUNTY"
+                        value={formData.billingState ?? ""}
+                        onChange={(e) => handleInputChange("billingState", e.target.value)}
+                      />
+                      <FormInputWithLabel
+                        label="ZIP CODE (Format: AAA-AAA)"
+                        placeholder="AAA-AAA"
+                        value={formData.billingZipCode ?? ""}
+                        onChange={(e) => {
+                          let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+                          if (v.length > 3) v = v.slice(0, 3) + "-" + v.slice(3);
+                          handleInputChange("billingZipCode", v);
+                        }}
+                      />
+                    </div>
+                    <FormSelectWithLabel
+                      label="COUNTRY *"
+                      value={formData.billingCountry ?? "GB"}
+                      onChange={(e) => handleInputChange("billingCountry", e.target.value)}
+                      options={[{ value: "GB", label: "United Kingdom" }]}
+                      placeholder="Country"
+                    />
+                  </div>
+                )}
               </div>
             </div>
-
           </div>
 
           {/* Order Summary */}
