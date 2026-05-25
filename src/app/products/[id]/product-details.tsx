@@ -26,6 +26,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import ViewInRoom from "../components/view-in-room";
+import { LoxaInsuranceWidget } from "@/components/loxa/loxa-insurance-widget";
 import {
   Accordion,
   AccordionContent,
@@ -324,6 +325,11 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
   const [showMobileOptionsSheet, setShowMobileOptionsSheet] = useState(false);
   const [showFinanceModal, setShowFinanceModal] = useState(false);
   const [showVariantError, setShowVariantError] = useState(false);
+  const [selectedInsurance, setSelectedInsurance] = useState<{
+    code: string;
+    inclusiveCode?: string;
+    price: number;
+  } | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
   const { isInWishlist, toggleItem } = useWishlistStore();
@@ -1255,6 +1261,13 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                 </div>
               </div>
             )}
+
+            <LoxaInsuranceWidget
+              sku={currentVariant?.sku || ""}
+              price={currentDiscountedPrice}
+              productTitle={product.name}
+              onInsuranceChange={setSelectedInsurance}
+            />
 
 
             {/* Description */}

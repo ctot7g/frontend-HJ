@@ -28,6 +28,10 @@ export interface LocalCartItem {
   updated_at: string;
   bundleVariants?: string[];
   show_installments?: boolean;
+  'loxa-insurance-code'?: string;
+  'loxa-inclusive-code'?: string;
+  insurance_price?: number;
+  insurance_name?: string;
   variant?: {
     color?: string;
     size?: string;
@@ -191,8 +195,6 @@ export const useCartStore = create<CartState>()(
           id: item.variant_id,
           variant_id: item.variant_id,
           name: item.name,
-          // Price passed from UI is already correctly discounted —
-          // trust it for the optimistic update before sync.
           price: item.price,
           quantity: quantity,
           assembly_required: false,
@@ -202,6 +204,10 @@ export const useCartStore = create<CartState>()(
           stock: item.stock,
           assemble_charges: item.assemble_charges,
           show_installments: item.show_installments,
+          'loxa-insurance-code': item['loxa-insurance-code'],
+          'loxa-inclusive-code': item['loxa-inclusive-code'],
+          insurance_price: item.insurance_price,
+          insurance_name: item.insurance_name,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
