@@ -180,15 +180,8 @@ useEffect(() => {
       <div className="mt-4 space-y-2">
         <div
           className={cn(
-            "cursor-pointer rounded-xl border-2 p-4 transition-all",
-            selectedInsurance?.code === defaultAddon.code
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-200 bg-gray-50 hover:border-gray-300",
+            "rounded-xl border-2 p-4 transition-all",
           )}
-          onClick={() => {
-            const anySelected = addons.some((a) => a.code === selectedInsurance?.code);
-            setSelectedInsurance(anySelected ? null : defaultAddon);
-          }}
         >
           <div className="flex items-start gap-3">
             <input
@@ -206,9 +199,8 @@ useEffect(() => {
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-semibold text-gray-800">
-                  Add {defaultAddon.insurance_term}-Year Protection for £
+                  Extend {defaultAddon.insurance_term}-Year Protection for £
                   {defaultAddon.insurance_price.toFixed(2)}
                 </span>
               </div>
@@ -218,7 +210,7 @@ useEffect(() => {
               </p>
               <button
                 type="button"
-                className="mt-1 text-xs font-medium text-blue-600 underline"
+                className="mt-1 text-xs font-medium text-blue-600 underline cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   openSidebar(defaultAddon);
@@ -522,7 +514,7 @@ function LoxaSidebar({
                   key={opt.code}
                   onClick={() => onSelect(opt)}
                   className={cn(
-                    "w-full rounded-lg border p-3 text-left text-sm transition-all",
+                    "w-full cursor-pointer rounded-lg border p-3 text-left text-sm transition-all",
                     selectedCode === opt.code
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-blue-300",
@@ -547,7 +539,7 @@ function LoxaSidebar({
                 allOptions[0];
               if (toSelect) onSelect(toSelect);
             }}
-            className="w-full rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+            className="w-full cursor-pointer rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
           >
             Add Protection
           </button>
