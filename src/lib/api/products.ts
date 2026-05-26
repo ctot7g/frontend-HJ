@@ -219,14 +219,42 @@ export interface ProductCreateInput {
   show_loxa?: boolean;
 }
 
+// export interface ProductUpdateInput {
+//   name?: string;
+//   description?: string;
+//   category_id?: string;
+//   base_price?: number;
+//   discount_offer?: number;
+//   show_installments?: boolean;
+//   show_loxa?: boolean;
+// }
+
 export interface ProductUpdateInput {
   name?: string;
   description?: string;
   category_id?: string;
   base_price?: number;
   discount_offer?: number;
+  is_visible?: boolean;
   show_installments?: boolean;
   show_loxa?: boolean;
+  warranty_info?: string;
+  care_instructions?: string;
+  assembly_required?: boolean;
+  assembly_instructions?: string;
+  delivery_info?: {
+    min_days?: number;
+    max_days?: number;
+    text?: string;
+    shipping_method?: string;
+    free_shipping_threshold?: number;
+  };
+  related_product_ids?: string[];
+  tags?: string;
+  material?: string;
+  brand?: string;
+  featured?: boolean;
+  delivery_time_days?: string;
 }
 
 // Featured Product interfaces for the optimized API response

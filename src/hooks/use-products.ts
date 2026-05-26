@@ -71,6 +71,8 @@ export function useProducts(params?: {
   return useQuery({
     queryKey: ["products", params],
     queryFn: () => getProducts(params),
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
@@ -86,7 +88,9 @@ export function useProduct(
   return useQuery({
     queryKey: ["products", id, params],
     queryFn: () => getProductById(id, params),
-    enabled: !!id, // Only run the query if id is provided
+    enabled: !!id,
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
