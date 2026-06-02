@@ -1292,7 +1292,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
               //   onInsuranceChange={setSelectedInsurance}
               // />
               <LoxaInsuranceWidget
-                sku={currentVariant?.sku || ""}
+                sku={product.id}
                 price={currentDiscountedPrice}
                 productTitle={product.name}
                 loxaComplimentaryYears={product.loxa_complimentary_years ?? undefined}
