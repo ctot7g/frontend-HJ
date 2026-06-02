@@ -1,3 +1,4 @@
+console.log('🔍 LoxaApi.ts loaded');
 export interface LoxaInsurance {
   code: string;
   name: string;
@@ -52,14 +53,17 @@ export const LoxaApi = {
         price: price.toString(),
         title,
       });
+      console.log('🔍 Loxa request:', { sku, price, title });
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/loxa/insurance?${params.toString()}`,
       );
+      console.log('📡 Loxa response status:', res.status);
 
       if (!res.ok) return null;
 
       const data = await res.json();
+      console.log('✅ Loxa response data:', data);
 
       if (!data.insurable || !data.active) return null;
 
