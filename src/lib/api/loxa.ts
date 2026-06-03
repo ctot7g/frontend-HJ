@@ -65,7 +65,7 @@ export const LoxaApi = {
       const data = await res.json();
       console.log('✅ Loxa response data:', data);
 
-      if (!data.insurable || !data.active) return null;
+      if (!data.insurable) return null;
 
       return data as LoxaInsuranceResponse;
     } catch {

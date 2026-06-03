@@ -49,15 +49,15 @@ export function LoxaInsuranceWidget({
     setIsLoading(true);
     setInsuranceData(null);
     LoxaApi.getInsuranceInfo(sku, price, productTitle)
-      .then((data) => {
-        if (data?.insurable && data?.active) {
-          setInsuranceData(data);
-        } else {
-          setInsuranceData(null);
-        }
-      })
-      .catch(() => setInsuranceData(null))
-      .finally(() => setIsLoading(false));
+    .then((data: LoxaInsuranceResponse | null) => {
+      if (data && data.insurable) {
+        setInsuranceData(data);
+      } else {
+        setInsuranceData(null);
+      }
+    })
+    .catch(() => setInsuranceData(null))
+    .finally(() => setIsLoading(false));
   }, [sku, price, productTitle]);
 
 
@@ -133,9 +133,9 @@ export function LoxaInsuranceWidget({
     if (hasComplimentaryYears) {
       return (
         <div className="mt-4 space-y-2">
-          <div className="rounded-xl border border-green-300 bg-green-50 p-4">
+          <div className="rounded-xl border p-4">
             <div className="flex items-start gap-3">
-              <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
+              {/* <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" /> */}
               <div>
                 <p className="text-sm font-semibold text-gray-800">
                   {loxaComplimentaryYears}-Year Free Protection Included
@@ -169,9 +169,9 @@ export function LoxaInsuranceWidget({
     return (
       <div className="mt-4 space-y-2">
         {/* Free base — always shown */}
-        <div className="rounded-xl border border-green-300 bg-green-50 p-4">
+        <div className="rounded-xl border p-4">
           <div className="flex items-start gap-3">
-            <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
+            {/* <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" /> */}
             <div className="flex-1">
               <span className="text-sm font-semibold text-gray-800">
                 {inclusiveBase.insurance_term}-Year Free Protection Included
@@ -344,17 +344,20 @@ export function LoxaInsuranceWidget({
     const defaultAddon = addons[0];
     if (!defaultAddon) return null;
 
+    // const isChecked = addons.some((a) => a.code === selectedInsurance?.code);
+    // const activeAddon = (isChecked ? selectedInsurance : null) ?? defaultAddon;
     const isChecked = addons.some((a) => a.code === selectedInsurance?.code);
-    const activeAddon = (isChecked ? selectedInsurance : null) ?? defaultAddon;
+    const activeAddon = isChecked ? selectedInsurance ?? defaultAddon : defaultAddon;
+    const displayAddon = isChecked ? activeAddon : defaultAddon;
 
     return (
       <div className="mt-4 space-y-2">
 
         {/* Free complimentary years banner (from product DB field) */}
         {hasComplimentaryYears && (
-          <div className="rounded-xl border border-green-300 bg-green-50 p-4">
+          <div className="rounded-xl border p-4">
             <div className="flex items-start gap-3">
-              <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
+              {/* <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" /> */}
               <div className="flex-1">
                 <span className="text-sm font-semibold text-gray-800">
                   {loxaComplimentaryYears}-Year Free Protection Included
@@ -433,7 +436,7 @@ export function LoxaInsuranceWidget({
                       }}
                       className={cn(
                         "rounded-lg border px-3 py-1 text-xs font-medium transition-all",
-                        activeAddon.code === addon.code
+                        isChecked && activeAddon.code === addon.code
                           ? "border-blue-500 bg-blue-500 text-white"
                           : "border-gray-300 text-gray-600 hover:border-blue-400",
                       )}
@@ -564,10 +567,13 @@ function LoxaSidebar({
 
   const content = insurance.insurance_content?.sidebar_content;
 
+
   const renderWithLinks = (str: string, links?: Record<string, string>) => {
+    // Remove IPID reference entirely from the string
+    str = str.replace("{%IPID%} and ", "");
+
     const hardcodedUrls: Record<string, string> = {
       "Policy Wording": "https://loxacover.com/product-protection-ad-breakdown-policy-latest",
-      "IPID": "https://loxacover.com/product-protection-ad-breakdown-policy-latest",
     };
 
     return str.split(/(\{\%.*?\%\})/g).map((part, i) => {
