@@ -166,7 +166,7 @@ export function LoxaInsuranceWidget({
     (i: LoxaInsurance) => i.extension,
   );
 
-<<<<<<< HEAD
+
   const openSidebar = (insurance: LoxaInsurance) => {
     setSidebarInsurance(insurance);
     setSidebarOpen(true);
@@ -178,16 +178,15 @@ export function LoxaInsuranceWidget({
     const defaultAddon = addons[0];
     if (!defaultAddon) return null;
 
-=======
   // ── CASE 2: HYBRID EXTENSION (priority 1) ───────────────────────
   if (integrationType === "hybrid_extension" && inclusiveBase) {
->>>>>>> loxa
+
     return (
       <div className="mt-4 space-y-2">
         {/* Free base — always shown */}
         <div className="rounded-xl border p-4">
           <div className="flex items-start gap-3">
-<<<<<<< HEAD
+
             <input
               type="checkbox"
               className="mt-1 h-4 w-4 cursor-pointer accent-blue-600"
@@ -225,7 +224,6 @@ export function LoxaInsuranceWidget({
                   // openSidebar(defaultAddon);
                   openSidebar(selectedInsurance || defaultAddon);
                 }}
-=======
             <div className="flex-1">
               <span className="text-sm font-semibold text-gray-800">
                 {inclusiveBase.insurance_term}-Year Free Protection Included
@@ -238,7 +236,7 @@ export function LoxaInsuranceWidget({
                 type="button"
                 className="mt-1 text-xs font-medium text-green-700 underline"
                 onClick={() => openSidebar(inclusiveBase)}
->>>>>>> loxa
+
               >
                 See details
               </button>
