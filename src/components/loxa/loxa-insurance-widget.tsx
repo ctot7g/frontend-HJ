@@ -166,64 +166,13 @@ export function LoxaInsuranceWidget({
     (i: LoxaInsurance) => i.extension,
   );
 
-
-  const openSidebar = (insurance: LoxaInsurance) => {
-    setSidebarInsurance(insurance);
-    setSidebarOpen(true);
-  };
-
-  // ── ADDON ──────────────────────────────────────────────────────
-  if (integrationType === "addon") {
-    // const defaultAddon = addons.find((i: LoxaInsurance) => i.default_selected) || addons[0];
-    const defaultAddon = addons[0];
-    if (!defaultAddon) return null;
-
   // ── CASE 2: HYBRID EXTENSION (priority 1) ───────────────────────
   if (integrationType === "hybrid_extension" && inclusiveBase) {
-
     return (
       <div className="mt-4 space-y-2">
         {/* Free base — always shown */}
         <div className="rounded-xl border p-4">
           <div className="flex items-start gap-3">
-
-            <input
-              type="checkbox"
-              className="mt-1 h-4 w-4 cursor-pointer accent-blue-600"
-              checked={addons.some((a) => a.code === selectedInsurance?.code)}
-              onChange={(e) => {
-                if (!e.target.checked) {
-                setSelectedInsurance(null);
-              } else {
-                setSelectedInsurance(defaultAddon);
-              }
-            }}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <img
-              src="/loxa.png"
-              alt="Loxa"
-              className="h-5 w-5 object-contain mt-[2px]"
-            />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-800">
-                  Add {(selectedInsurance || defaultAddon).insurance_term}-Year Protection for £
-                  {(selectedInsurance || defaultAddon).insurance_price.toFixed(2)}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                  {(selectedInsurance || defaultAddon).insurance_content?.description ||
-                  "Covers accidental damage and structural defects."}
-              </p>
-              <button
-                type="button"
-                className="mt-1 text-xs font-medium text-blue-600 underline cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // openSidebar(defaultAddon);
-                  openSidebar(selectedInsurance || defaultAddon);
-                }}
             <div className="flex-1">
               <span className="text-sm font-semibold text-gray-800">
                 {inclusiveBase.insurance_term}-Year Free Protection Included
@@ -236,7 +185,6 @@ export function LoxaInsuranceWidget({
                 type="button"
                 className="mt-1 text-xs font-medium text-green-700 underline"
                 onClick={() => openSidebar(inclusiveBase)}
-
               >
                 See details
               </button>
@@ -668,20 +616,11 @@ function LoxaSidebar({
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-<<<<<<< HEAD
-      <SheetContent side="right" className="w-full max-w-md overflow-y-auto [&>button]:top-8">
-        <img
-          src="/loxa.png"
-          alt="Loxa"
-          className="h-8 w-8 object-contain mb-2"
-        />
-=======
       <SheetContent
         side="right"
         className="w-full max-w-md overflow-y-auto [&>button]:top-8"
       >
         <img src="/loxa.png" alt="Loxa" className="h-8 w-8 object-contain mb-2" />
->>>>>>> loxa
         <SheetHeader>
           <SheetTitle className="text-left mt-4">
             {content?.header || insurance.name}
