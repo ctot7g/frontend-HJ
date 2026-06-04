@@ -171,7 +171,6 @@ export function LoxaInsuranceWidget({
         {/* Free base — always shown */}
         <div className="rounded-xl border p-4">
           <div className="flex items-start gap-3">
-            {/* <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" /> */}
             <div className="flex-1">
               <span className="text-sm font-semibold text-gray-800">
                 {inclusiveBase.insurance_term}-Year Free Protection Included
