@@ -84,6 +84,7 @@ export interface Product {
   show_installments?: boolean;
   show_loxa?: boolean;
   loxa_complimentary_years?: number | null;
+  show_sofadeal_coverage?: boolean;
 }
 
 export interface ProductVariant {
