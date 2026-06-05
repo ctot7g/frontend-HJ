@@ -587,6 +587,7 @@ interface LoxaSidebarProps {
   onSelect: (insurance: LoxaInsurance) => void;
   onContinueWithoutProtection?: () => void;
   openedFromPrompt?: boolean;
+  hasComplimentaryYears?: boolean;
 }
 
 function LoxaSidebar({
@@ -598,6 +599,7 @@ function LoxaSidebar({
   onSelect,
   onContinueWithoutProtection,
   openedFromPrompt,
+  hasComplimentaryYears,
 }: LoxaSidebarProps) {
   if (!insurance) return null;
 
@@ -668,6 +670,40 @@ function LoxaSidebar({
             <p className="text-sm text-gray-600">{content.subheading}</p>
           )}
 
+          <button
+            type="button"
+            onClick={() => {
+              const toSelect =
+                allOptions.find((o: LoxaInsurance) => o.code === selectedCode) ||
+                allOptions[0];
+              if (toSelect) onSelect(toSelect);
+            }}
+            className="w-full cursor-pointer rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Add Protection
+          </button>
+
+          {openedFromPrompt ? (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onContinueWithoutProtection?.();
+              }}
+              className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Continue without protection
+            </button>
+            ) : (
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              No Thanks
+            </button>
+          )}
+
           {content?.terms && (
             <div className="rounded-lg bg-gray-50 p-4">
               <p className="mb-2 text-sm font-semibold">{content.terms.heading}</p>
@@ -713,20 +749,7 @@ function LoxaSidebar({
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => {
-              const toSelect =
-                allOptions.find((o: LoxaInsurance) => o.code === selectedCode) ||
-                allOptions[0];
-              if (toSelect) onSelect(toSelect);
-            }}
-            className="w-full cursor-pointer rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            Add Protection
-          </button>
-
-          {openedFromPrompt ? (
+          {/* {openedFromPrompt ? (
             <button
               type="button"
               onClick={() => {
@@ -743,9 +766,9 @@ function LoxaSidebar({
               onClick={onClose}
               className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
-              Close sidebar
+              No Thanks
             </button>
-          )}
+          )} */}
 
           {content?.legal_disclaimer && (
             <p className="text-[10px] leading-relaxed text-gray-400">
