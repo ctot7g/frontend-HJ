@@ -200,17 +200,13 @@ export function LoxaInsuranceWidget({
               <span className="text-sm font-semibold text-gray-800">
                 {inclusiveBase.insurance_term}-Year Free Protection Included
               </span>
-              <p className="mt-1 text-xs text-gray-500">
+              {/* <p className="mt-1 text-xs text-gray-500">
                 {inclusiveBase.insurance_content?.description ||
                   "Base protection included at no extra cost."}
+              </p> */}
+              <p className="mt-1 text-xs text-gray-500">
+                Complimentary protection provided with your purchase by SofaDeal.
               </p>
-              <button
-                type="button"
-                className="mt-1 text-xs font-medium text-green-700 underline"
-                onClick={() => openSidebar(inclusiveBase)}
-              >
-                See details
-              </button>
             </div>
           </div>
         </div>
@@ -272,6 +268,7 @@ export function LoxaInsuranceWidget({
           }}
           openedFromPrompt={openedFromPrompt}
           onContinueWithoutProtection={onContinueWithoutProtection}
+           hasComplimentaryYears={!!hasComplimentaryYears}
         />
 
       
@@ -363,6 +360,7 @@ export function LoxaInsuranceWidget({
           }}
           openedFromPrompt={openedFromPrompt}
           onContinueWithoutProtection={onContinueWithoutProtection}
+          hasComplimentaryYears={!!hasComplimentaryYears}
         />
       </div>
     );
@@ -492,6 +490,7 @@ export function LoxaInsuranceWidget({
           }}
           openedFromPrompt={openedFromPrompt}
           onContinueWithoutProtection={onContinueWithoutProtection}
+          hasComplimentaryYears={!!hasComplimentaryYears}
         />
       </div>
     );
@@ -566,6 +565,7 @@ export function LoxaInsuranceWidget({
           }}
           openedFromPrompt={openedFromPrompt}
           onContinueWithoutProtection={onContinueWithoutProtection}
+          hasComplimentaryYears={!!hasComplimentaryYears}
         />
       </div>
     );
@@ -661,14 +661,26 @@ function LoxaSidebar({
       >
         <img src="/loxa.png" alt="Loxa" className="h-8 w-8 object-contain mb-2" />
         <SheetHeader>
-          <SheetTitle className="text-left mt-4">
+          {/* <SheetTitle className="text-left mt-4">
             {content?.header || insurance.name}
+          </SheetTitle> */}
+          <SheetTitle className="text-left mt-4">
+            {hasComplimentaryYears
+              ? `Extend Your ${insurance.insurance_term}-Year Protection`
+              : content?.header || insurance.name}
           </SheetTitle>
         </SheetHeader>
         <div className="mt-4 space-y-4">
-          {content?.subheading && (
+          {/* {content?.subheading && (
             <p className="text-sm text-gray-600">{content.subheading}</p>
-          )}
+          )} */}
+          {hasComplimentaryYears ? (
+            <p className="text-sm text-gray-600">
+              Extend your complimentary protection for complete long-term peace of mind.
+            </p>
+          ) : content?.subheading ? (
+            <p className="text-sm text-gray-600">{content.subheading}</p>
+          ) : null}
 
           <button
             type="button"
@@ -704,7 +716,7 @@ function LoxaSidebar({
             </button>
           )}
 
-          {content?.terms && (
+          {/* {content?.terms && (
             <div className="rounded-lg bg-gray-50 p-4">
               <p className="mb-2 text-sm font-semibold">{content.terms.heading}</p>
               <ul className="space-y-2">
@@ -721,7 +733,39 @@ function LoxaSidebar({
                 </div>
               )}
             </div>
-          )}
+          )} */}
+
+          <div className="rounded-lg bg-gray-50 p-4">
+            <p className="mb-2 text-sm font-semibold">What to expect</p>
+            <ul className="space-y-2">
+              {hasComplimentaryYears ? (
+                <>
+                  {[
+                    "Covers accidental stains such as food, drink, ink, make up and more",
+                    "Covers accidental damage such as rips, tears, scratches, burns and damage caused by pets",
+                    "For approved claims, our team will arrange the right fix, which may be at-home repair or a replacement item",
+                  ].map((line, i) => (
+                    <li key={i} className="text-sm text-gray-600 flex gap-2">
+                      <span className="text-green-500 font-bold">✓</span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </>
+              ) : (
+              content?.terms?.lines.map(
+                (
+                  line: string | { text?: string; links?: Record<string, string> },
+                  i: number,
+                ) => renderTermLine(line, i),
+              )
+              )}
+            </ul>
+            {content?.footer_pill && (
+              <div className="mt-3 rounded-full bg-green-100 px-3 py-1 text-center text-xs font-medium text-green-700">
+                {content.footer_pill}
+              </div>
+            )}
+          </div>
 
           {allOptions.length > 1 && (
             <div className="space-y-2">
