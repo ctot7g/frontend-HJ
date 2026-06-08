@@ -438,7 +438,15 @@ const handlePlaceOrder = async (installmentMeta?: {
             floor_id: formData.floorId,
           }
         : undefined,
-        cart_items: convertCartItemsToPaymentFormat(items),
+        cart_items: convertCartItemsToPaymentFormat(
+          items.filter(
+            (item) =>
+              !item['loxa-insurance-code'] &&
+              !item.insurance_price &&
+              !item.loxa_complimentary_years &&
+              !item.is_sofadeal_coverage
+          )
+        ),
         coupon_code: appliedCoupon?.code,
         discount_amount: totalDiscount > 0 ? totalDiscount : 0,
         wallet_amount_used: walletDiscount > 0 ? walletDiscount : 0,
