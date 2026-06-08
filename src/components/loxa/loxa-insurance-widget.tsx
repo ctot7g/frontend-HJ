@@ -21,6 +21,7 @@ interface LoxaInsuranceWidgetProps {
     code: string;
     inclusiveCode?: string;
     price: number;
+    years?: number;
   } | null) => void;
   showPrompt?: boolean;
   onPromptClose?: () => void;
@@ -91,12 +92,14 @@ export function LoxaInsuranceWidget({
       onInsuranceChange({
         code: selectedInsurance.code,
         price: selectedInsurance.insurance_price,
+        years: Number(selectedInsurance.insurance_term),
       });
     } else if (integrationType === "inclusive") {
       onInsuranceChange({
         code: selectedInsurance.code,
         inclusiveCode: selectedInsurance.code,
         price: 0,
+        years: Number(selectedInsurance.insurance_term),
       });
     } else if (
       integrationType === "hybrid_extension" ||
@@ -110,12 +113,14 @@ export function LoxaInsuranceWidget({
           code: selectedInsurance.code,
           inclusiveCode: base.code,
           price: selectedInsurance.insurance_price,
+          years: Number(selectedInsurance.insurance_term),
         });
       } else if (base && selectedInsurance.is_base_insurance_product) {
         onInsuranceChange({
           code: "",
           inclusiveCode: base.code,
           price: 0,
+          years: Number(selectedInsurance.insurance_term),
         });
       }
     }

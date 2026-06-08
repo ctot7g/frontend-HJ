@@ -233,39 +233,55 @@ export const useCartStore = create<CartState>()(
       },
 
       removeItem: async (id) => {
-  const { items, removeItemLocally, performActionForAuthUser } = get();
+        const { items, removeItemLocally, performActionForAuthUser } = get();
 
-  const itemToRemove = items.find((item) => item.id === id);
-  if (!itemToRemove) {
-    console.warn(`Item with id ${id} not found in cart`);
-    return;
-  }
+        const itemToRemove = items.find((item) => item.id === id);
+        if (!itemToRemove) {
+          console.warn(`Item with id ${id} not found in cart`);
+          return;
+        }
 
-  // Handle local-only items without hitting the server
-  if (
-    itemToRemove.delivery_time_days === "Bundle" ||
-    itemToRemove['loxa-insurance-code'] ||
-    itemToRemove.insurance_price ||
-    itemToRemove.loxa_complimentary_years ||
-    itemToRemove.is_sofadeal_coverage
-  ) {
-    removeItemLocally(id);
-    return;
-  }
+        // Handle local-only items without hitting the server
+        if (
+          itemToRemove.delivery_time_days === "Bundle" ||
+          itemToRemove['loxa-insurance-code'] ||
+          itemToRemove.insurance_price ||
+          itemToRemove.loxa_complimentary_years ||
+          itemToRemove.is_sofadeal_coverage
+        ) {
+          removeItemLocally(id);
+          return;
+        }
 
-  if (!get().checkAuthStatus()) {
-    removeItemLocally(id);
-    return;
-  }
+        // When removing a real product, also remove any associated protection item
+        const variantId = itemToRemove.variant_id;
+        const associatedProtection = items.find(
+          (i) =>
+            (i.id === `loxa-${variantId}` ||
+            i.id === `loxa-free-${variantId}` ||
+            i.id === `sofadeal-coverage-${variantId}`) &&
+            (i['loxa-insurance-code'] ||
+            i.insurance_price ||
+            i.loxa_complimentary_years ||
+            i.is_sofadeal_coverage)
+        );
+        if (associatedProtection) {
+          removeItemLocally(associatedProtection.id);
+        }
 
-  await performActionForAuthUser({
-    action: async () => {
-      await CartApiService.removeFromCart(id);
-    },
-    revertAction: () => {},
-    extraParams: { id },
-  });
-},
+        if (!get().checkAuthStatus()) {
+          removeItemLocally(id);
+          return;
+        }
+
+        await performActionForAuthUser({
+          action: async () => {
+            await CartApiService.removeFromCart(id);
+          },
+          revertAction: () => {},
+          extraParams: { id },
+        });
+      },
 
       updateQuantity: async (id, quantity) => {
         if (quantity <= 0) {

@@ -332,6 +332,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
     code: string;
     inclusiveCode?: string;
     price: number;
+    years?: number;
   } | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
@@ -545,67 +546,6 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
   const { addToCart } = useCartAnimationStore();
 
   // ── handlers ──────────────────────────────────────────────────
-  // const handleAddToCart = () => {
-  //   if (uniqueColors.length > 0 && !selectedColor) {
-  //     setShowVariantError(true);
-  //     document.getElementById("variant-selection")?.scrollIntoView({ behavior: "smooth" });
-  //     return;
-  //   }
-  //   if (uniqueSizes.length > 0 && !selectedSize) {
-  //     setShowVariantError(true);
-  //     document.getElementById("variant-selection")?.scrollIntoView({ behavior: "smooth" });
-  //     return;
-  //   }
-  //   if (currentStock === 0) return;
-  //   setShowVariantError(false);
-  //   addToCart({ item: "item added" });
-  //   if (product && currentVariant && currentStock > 0) {
-  //     const productImage = displayImages.length > 0 ? displayImages[0].url : undefined;
-  //     const variantParts = [];
-  //     if (selectedColor) variantParts.push(selectedColor);
-  //     if (selectedSize) variantParts.push(selectedSize);
-  //     if (selectedMaterial) variantParts.push(selectedMaterial);
-  //     const variantDescription =
-  //       variantParts.length > 0 ? ` - ${variantParts.join(", ")}` : "";
-  //     addItem({
-  //       id: currentVariant.id,
-  //       name: `${product.name}${variantDescription}`,
-  //       price: currentDiscountedPrice,
-  //       image: productImage,
-  //       variant_id: currentVariant.id,
-  //       color: selectedColor || currentVariant.color,
-  //       assembly_required: false,
-  //       assemble_charges: currentVariant.assemble_charges || 0,
-  //       show_installments: product.show_installments ?? true,
-  //       variant: {
-  //         color: selectedColor || currentVariant.color,
-  //         size: selectedSize || currentVariant.size,
-  //         material: selectedMaterial || currentVariant.material,
-  //         sku: currentVariant.sku,
-  //       },
-  //     });
-  //     if (selectedInsurance && selectedInsurance.price > 0) {
-  //       addItemLocally({
-  //         id: `loxa-${currentVariant.id}`,
-  //         variant_id: `loxa-${currentVariant.id}`,
-  //         name: `Protection Extension for ${product.name}`,
-  //         price: selectedInsurance.price,
-  //         quantity: 1,
-  //         assembly_required: false,
-  //         assemble_charges: 0,
-  //         show_installments: false,
-  //         'loxa-insurance-code': selectedInsurance.code,
-  //         'loxa-inclusive-code': selectedInsurance.inclusiveCode,
-  //         insurance_price: selectedInsurance.price,
-  //         insurance_name: "Protection Extension",
-  //         created_at: new Date().toISOString(),
-  //         updated_at: new Date().toISOString(),
-  //       });
-  //       calculateTotals();
-  //     }
-  //   }
-  // };
-
   const handleAddToCart = () => {
   if (uniqueColors.length > 0 && !selectedColor) {
     setShowVariantError(true);
@@ -656,11 +596,18 @@ const proceedToAddToCart = () => {
     });
 
     if (selectedInsurance && selectedInsurance.price > 0) {
-      // Paid extension
+      const complimentaryYears = product.loxa_complimentary_years ?? 0;
+      const totalYears = selectedInsurance.years ?? 0;
+      const extraYears = complimentaryYears > 0 ? totalYears - complimentaryYears : 0;
+
+      const protectionName = complimentaryYears > 0 && extraYears > 0
+        ? `${totalYears}-Year Protection (Extended by ${extraYears} yr${extraYears !== 1 ? "s" : ""}) for ${product.name}`
+        : `${totalYears > 0 ? `${totalYears}-Year ` : ""}Protection for ${product.name}`;
+
       addItemLocally({
         id: `loxa-${currentVariant.id}`,
         variant_id: `loxa-${currentVariant.id}`,
-        name: `Protection Extension for ${product.name}`,
+        name: protectionName,
         price: selectedInsurance.price,
         quantity: 1,
         assembly_required: false,
@@ -674,7 +621,8 @@ const proceedToAddToCart = () => {
         updated_at: new Date().toISOString(),
       });
       calculateTotals();
-    } else if (product.show_sofadeal_coverage) {
+    }
+    else if (product.show_sofadeal_coverage) {
       // SofaDeal full coverage — free, display only
       addItemLocally({
         id: `sofadeal-coverage-${currentVariant.id}`,
@@ -695,7 +643,7 @@ const proceedToAddToCart = () => {
       addItemLocally({
         id: `loxa-free-${currentVariant.id}`,
         variant_id: `loxa-free-${currentVariant.id}`,
-        name: `${product.loxa_complimentary_years}-Year Free Protection`,
+        name: `${product.loxa_complimentary_years}-Year Free Protection for ${product.name}`,
         price: 0,
         quantity: 1,
         assembly_required: false,
