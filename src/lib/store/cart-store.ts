@@ -32,6 +32,8 @@ export interface LocalCartItem {
   'loxa-inclusive-code'?: string;
   insurance_price?: number;
   insurance_name?: string;
+  loxa_complimentary_years?: number;
+  is_sofadeal_coverage?: boolean;
   variant?: {
     color?: string;
     size?: string;
@@ -243,7 +245,9 @@ export const useCartStore = create<CartState>()(
   if (
     itemToRemove.delivery_time_days === "Bundle" ||
     itemToRemove['loxa-insurance-code'] ||
-    itemToRemove.insurance_price
+    itemToRemove.insurance_price ||
+    itemToRemove.loxa_complimentary_years ||
+    itemToRemove.is_sofadeal_coverage
   ) {
     removeItemLocally(id);
     return;
@@ -442,7 +446,9 @@ export const useCartStore = create<CartState>()(
             (i) =>
               i.delivery_time_days === "Bundle" ||
               i['loxa-insurance-code'] ||
-              i.insurance_price
+              i.insurance_price ||
+              i.loxa_complimentary_years ||
+              i.is_sofadeal_coverage
           );
 
           const serverItems = serverCart.items.map(convertApiItemToLocal);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { Shield } from "lucide-react";
 import { LoxaApi, LoxaInsurance, LoxaInsuranceResponse } from "@/lib/api/loxa";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ interface LoxaInsuranceWidgetProps {
   showPrompt?: boolean;
   onPromptClose?: () => void;
   onContinueWithoutProtection?: () => void;
+  isSofaDealCoverage?: boolean;
 }
 
 export function LoxaInsuranceWidget({
@@ -35,6 +37,7 @@ export function LoxaInsuranceWidget({
   showPrompt = false,
   onPromptClose,
   onContinueWithoutProtection,
+  isSofaDealCoverage = false,
 }: LoxaInsuranceWidgetProps) {
   const [insuranceData, setInsuranceData] = useState<LoxaInsuranceResponse | null>(null);
   const [selectedInsurance, setSelectedInsurance] = useState<LoxaInsurance | null>(null);
@@ -151,6 +154,64 @@ export function LoxaInsuranceWidget({
   // ── LOADING ─────────────────────────────────────────────────────
   if (isLoading) return null;
 
+  // ── CASE 0: SofaDeal full coverage ──────────────────────────────
+  if (isSofaDealCoverage) {
+    return (
+      <div className="mt-4 space-y-2">
+        <div className="rounded-xl border p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/loxa.png"
+                  alt="Loxa"
+                  width={20}
+                  height={20}
+                />
+                <p className="text-sm font-semibold text-gray-800">
+                  Free 5-year Protection Included
+                </p>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Protect you against accidental stains, accidental damage and structural defects.
+              </p>
+              <button
+                type="button"
+                className="mt-1 text-xs font-medium text-blue-600 underline cursor-pointer"
+                onClick={() => {
+                  setSidebarOpen(true);
+                }}
+              >
+                See Details
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <LoxaSidebar
+          insurance={{
+            code: "sofadeal-coverage",
+            name: "SofaDeal Full Coverage",
+            insurance_term: 0,
+            insurance_price: 0,
+            pricing_type: "inclusive",
+            is_base_insurance_product: true,
+            extension: false,
+            insurance_content: null,
+          } as unknown as LoxaInsurance}
+          allOptions={[]}
+          selectedCode={null}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onSelect={() => setSidebarOpen(false)}
+          openedFromPrompt={false}
+          hasComplimentaryYears={false}
+          isSofaDealCoverage={true}
+        />
+      </div>
+    );
+  }
+
   // ── CASE 1: No API data at all ───────────────────────────────────
   // If complimentary years set → show free banner only (no extend option
   // because we have no API pricing data to offer)
@@ -193,8 +254,8 @@ export function LoxaInsuranceWidget({
   if (integrationType === "hybrid_extension" && inclusiveBase) {
 
     const visibleExtensions = extensions.filter(
-  (e) => Number(e.insurance_term) > (loxaComplimentaryYears ?? 0)
-);
+      (e) => Number(e.insurance_term) > (loxaComplimentaryYears ?? 0)
+    );
 
     return (
       <div className="mt-4 space-y-2">
@@ -615,6 +676,7 @@ interface LoxaSidebarProps {
   onContinueWithoutProtection?: () => void;
   openedFromPrompt?: boolean;
   hasComplimentaryYears?: number | boolean;
+  isSofaDealCoverage?: boolean;
 }
 
 function LoxaSidebar({
@@ -627,6 +689,7 @@ function LoxaSidebar({
   onContinueWithoutProtection,
   openedFromPrompt,
   hasComplimentaryYears,
+  isSofaDealCoverage = false,
 }: LoxaSidebarProps) {
   if (!insurance) return null;
 
@@ -688,20 +751,20 @@ function LoxaSidebar({
       >
         <img src="/loxa.png" alt="Loxa" className="h-8 w-8 object-contain mb-2" />
         <SheetHeader>
-          {/* <SheetTitle className="text-left mt-4">
-            {content?.header || insurance.name}
-          </SheetTitle> */}
           <SheetTitle className="text-left mt-4">
-            {hasComplimentaryYears
+            {isSofaDealCoverage
+              ? "Full Protection — Covered by SofaDeal"
+              : hasComplimentaryYears
               ? `Extend Your ${insurance.insurance_term}-Year Protection`
               : content?.header || insurance.name}
           </SheetTitle>
         </SheetHeader>
         <div className="mt-4 space-y-4">
-          {/* {content?.subheading && (
-            <p className="text-sm text-gray-600">{content.subheading}</p>
-          )} */}
-          {hasComplimentaryYears ? (
+          {isSofaDealCoverage ? (
+            <p className="text-sm text-gray-600">
+              This product comes with complete insurance coverage provided by SofaDeal at no extra cost to you.
+            </p>
+          ) : hasComplimentaryYears ? (
             <p className="text-sm text-gray-600">
               Extend your complimentary protection for complete long-term peace of mind.
             </p>
@@ -709,63 +772,58 @@ function LoxaSidebar({
             <p className="text-sm text-gray-600">{content.subheading}</p>
           ) : null}
 
-          <button
-            type="button"
-            onClick={() => {
-              const toSelect =
-                allOptions.find((o: LoxaInsurance) => o.code === selectedCode) ||
-                allOptions[0];
-              if (toSelect) onSelect(toSelect);
-            }}
-            className="w-full cursor-pointer rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            Add Protection
-          </button>
-
-          {openedFromPrompt ? (
+          {!isSofaDealCoverage && (
             <button
               type="button"
               onClick={() => {
-                onClose();
-                onContinueWithoutProtection?.();
+                const toSelect =
+                  allOptions.find((o: LoxaInsurance) => o.code === selectedCode) ||
+                  allOptions[0];
+                if (toSelect) onSelect(toSelect);
               }}
-              className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              className="w-full cursor-pointer rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
             >
-              Continue without protection
+              Add Protection
             </button>
+          )}
+
+          {!isSofaDealCoverage && (
+            openedFromPrompt ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onContinueWithoutProtection?.();
+                }}
+                className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Continue without protection
+              </button>
             ) : (
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                No Thanks
+              </button>
+            )
+          )}
+          {isSofaDealCoverage && (
             <button
               type="button"
               onClick={onClose}
               className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
-              No Thanks
+              Close
             </button>
           )}
 
-          {/* {content?.terms && (
-            <div className="rounded-lg bg-gray-50 p-4">
-              <p className="mb-2 text-sm font-semibold">{content.terms.heading}</p>
-              <ul className="space-y-2">
-                {content.terms.lines.map(
-                  (
-                    line: string | { text?: string; links?: Record<string, string> },
-                    i: number,
-                  ) => renderTermLine(line, i),
-                )}
-              </ul>
-              {content.footer_pill && (
-                <div className="mt-3 rounded-full bg-green-100 px-3 py-1 text-center text-xs font-medium text-green-700">
-                  {content.footer_pill}
-                </div>
-              )}
-            </div>
-          )} */}
 
           <div className="rounded-lg bg-gray-50 p-4">
             <p className="mb-2 text-sm font-semibold">What to expect</p>
             <ul className="space-y-2">
-              {hasComplimentaryYears ? (
+              {(isSofaDealCoverage || hasComplimentaryYears) ? (
                 <>
                   {[
                     "Covers accidental stains such as food, drink, ink, make up and more",
@@ -777,15 +835,27 @@ function LoxaSidebar({
                       <span>{line}</span>
                     </li>
                   ))}
+                  <li className="text-sm text-gray-600 flex gap-2">
+                    <span>For full details of what's covered and excluded, see the{" "}
+                      <a
+                        href="https://loxacover.com/product-protection-ad-breakdown-policy-latest"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline mx-1"
+                      >
+                        Policy Wording
+                      </a>
+                    </span>
+                  </li>
                 </>
-              ) : (
-              content?.terms?.lines.map(
-                (
-                  line: string | { text?: string; links?: Record<string, string> },
-                  i: number,
-                ) => renderTermLine(line, i),
-              )
-              )}
+                ) : (
+                  content?.terms?.lines.map(
+                    (
+                      line: string | { text?: string; links?: Record<string, string> },
+                      i: number,
+                    ) => renderTermLine(line, i),
+                  )
+                )}
             </ul>
             {content?.footer_pill && (
               <div className="mt-3 rounded-full bg-green-100 px-3 py-1 text-center text-xs font-medium text-green-700">
@@ -809,12 +879,11 @@ function LoxaSidebar({
                       : "border-gray-200 hover:border-blue-300",
                   )}
                 >
-                  {/* <span className="font-medium">{opt.insurance_term} Year</span> */}
                   <span className="font-medium">
-  {hasComplimentaryYears
-    ? `+${Number(opt.insurance_term) - Number(hasComplimentaryYears)} yr — Total ${opt.insurance_term} Years`
-    : `${opt.insurance_term} Year`}
-</span>
+                    {hasComplimentaryYears
+                      ? `+${Number(opt.insurance_term) - Number(hasComplimentaryYears)} yr — Total ${opt.insurance_term} Years`
+                      : `${opt.insurance_term} Year`}
+                  </span>
                   {opt.insurance_price > 0 && (
                     <span className="ml-2 text-gray-500">
                       £{opt.insurance_price.toFixed(2)}
@@ -824,27 +893,6 @@ function LoxaSidebar({
               ))}
             </div>
           )}
-
-          {/* {openedFromPrompt ? (
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onContinueWithoutProtection?.();
-              }}
-              className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
-            >
-              Continue without protection
-            </button>
-            ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full cursor-pointer rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
-            >
-              No Thanks
-            </button>
-          )} */}
 
           {content?.legal_disclaimer && (
             <p className="text-[10px] leading-relaxed text-gray-400">

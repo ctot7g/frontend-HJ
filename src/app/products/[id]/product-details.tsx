@@ -654,7 +654,9 @@ const proceedToAddToCart = () => {
         sku: currentVariant.sku,
       },
     });
+
     if (selectedInsurance && selectedInsurance.price > 0) {
+      // Paid extension
       addItemLocally({
         id: `loxa-${currentVariant.id}`,
         variant_id: `loxa-${currentVariant.id}`,
@@ -668,6 +670,38 @@ const proceedToAddToCart = () => {
         'loxa-inclusive-code': selectedInsurance.inclusiveCode,
         insurance_price: selectedInsurance.price,
         insurance_name: "Protection Extension",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      calculateTotals();
+    } else if (product.show_sofadeal_coverage) {
+      // SofaDeal full coverage — free, display only
+      addItemLocally({
+        id: `sofadeal-coverage-${currentVariant.id}`,
+        variant_id: `sofadeal-coverage-${currentVariant.id}`,
+        name: `Full Protection — Covered by SofaDeal`,
+        price: 0,
+        quantity: 1,
+        assembly_required: false,
+        assemble_charges: 0,
+        show_installments: false,
+        is_sofadeal_coverage: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      calculateTotals();
+    } else if (product.loxa_complimentary_years && product.loxa_complimentary_years > 0 && !selectedInsurance) {
+      // Free complimentary years — display only
+      addItemLocally({
+        id: `loxa-free-${currentVariant.id}`,
+        variant_id: `loxa-free-${currentVariant.id}`,
+        name: `${product.loxa_complimentary_years}-Year Free Protection`,
+        price: 0,
+        quantity: 1,
+        assembly_required: false,
+        assemble_charges: 0,
+        show_installments: false,
+        loxa_complimentary_years: product.loxa_complimentary_years,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
@@ -1355,38 +1389,18 @@ const proceedToAddToCart = () => {
             )}
 
 
-            {(product.show_sofadeal_coverage) ? (
-              <div className="mt-4 rounded-xl border p-4">
-                <div className="flex items-start gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">
-                      Full Protection Included — Covered by SofaDeal
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      This product comes with complete insurance coverage provided by SofaDeal at no extra cost to you.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              ) : (product.show_loxa ?? true) && (
-              // <LoxaInsuranceWidget
-              //   sku={currentVariant?.sku || ""}
-              //   price={currentDiscountedPrice}
-              //   productTitle={product.name}
-              //   loxaComplimentaryYears={product.loxa_complimentary_years ?? undefined}
-              //   onInsuranceChange={setSelectedInsurance}
-              // />
-
+            {(product.show_sofadeal_coverage || (product.show_loxa ?? true)) && (
               <LoxaInsuranceWidget
-  sku={currentVariant?.sku || ""}
-  price={currentDiscountedPrice}
-  productTitle={product.name}
-  loxaComplimentaryYears={product.loxa_complimentary_years ?? undefined}
-  onInsuranceChange={setSelectedInsurance}
-  showPrompt={showLoxaPrompt}
-  onPromptClose={() => setShowLoxaPrompt(false)}
-  onContinueWithoutProtection={proceedToAddToCart}
-/>
+                sku={currentVariant?.sku || ""}
+                price={currentDiscountedPrice}
+                productTitle={product.name}
+                loxaComplimentaryYears={product.loxa_complimentary_years ?? undefined}
+                onInsuranceChange={setSelectedInsurance}
+                showPrompt={showLoxaPrompt}
+                onPromptClose={() => setShowLoxaPrompt(false)}
+                onContinueWithoutProtection={proceedToAddToCart}
+                isSofaDealCoverage={product.show_sofadeal_coverage ?? false}
+              />
             )}
 
 

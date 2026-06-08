@@ -25,12 +25,50 @@ export function OrderItem1({ item }: { item: LocalCartItem }) {
     isItemLoading,
   } = useCart();
 
+  if (item.is_sofadeal_coverage || item.loxa_complimentary_years) {
+    return (
+      <div className="relative flex flex-wrap items-center gap-4 border-b border-gray-100 py-4 sm:flex-nowrap">
+        {/* Loxa Logo */}
+        <div className="h-20 w-20 shrink-0 rounded overflow-hidden md:h-36 md:w-36">
+          <img
+            src="/loxa.png"
+            alt="Loxa"
+            className="h-full w-full object-contain"
+          />
+        </div>
+
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-medium text-gray-900 uppercase md:text-[27px]">
+            {item.name}
+          </h3>
+          <p className="mt-1 text-xs text-gray-500">
+            {item.is_sofadeal_coverage
+              ? "Complete coverage provided by SofaDeal"
+              : `${item.loxa_complimentary_years}-Year complimentary protection`}
+          </p>
+        </div>
+
+        {/* FREE badge */}
+        <div className="mt-4 flex w-full items-center justify-end sm:mt-0 sm:w-auto">
+          <div className="min-w-20 text-right">
+            <span className="text-lg font-medium text-green-600">FREE</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (item['loxa-insurance-code'] || item.insurance_price) {
     return (
       <div className="relative flex flex-wrap items-center gap-4 border-b border-gray-100 py-4 sm:flex-nowrap">
         {/* Loxa Logo */}
-        <div className="h-20 w-20 shrink-0 rounded bg-black flex items-center justify-center md:h-36 md:w-36">
-          <span className="text-white font-bold text-xl">LOXA</span>
+        <div className="h-20 w-20 shrink-0 rounded overflow-hidden md:h-36 md:w-36">
+          <img
+            src="/loxa.png"
+            alt="Loxa"
+            className="h-full w-full object-contain"
+          />
         </div>
 
         {/* Info */}
@@ -50,7 +88,7 @@ export function OrderItem1({ item }: { item: LocalCartItem }) {
           </button>
         </div>
 
-        {/* Price — no quantity controls */}
+        {/* Price */}
         <div className="mt-4 flex w-full items-center justify-end sm:mt-0 sm:w-auto">
           <div className="min-w-20 text-right">
             <span className="text-lg font-medium">
@@ -180,13 +218,40 @@ export function OrderItem2({ item }: { item: LocalCartItem }) {
   const { updateQuantity, updateAssemblyRequired, removeItem, isItemLoading } =
     useCart();
 
+  if (item.is_sofadeal_coverage || item.loxa_complimentary_years) {
+    return (
+      <div className="rounded-md border bg-white/30 p-3">
+        <div className="flex gap-3">
+          <img
+            src="/loxa.png"
+            alt="Loxa"
+            className="h-16 w-16 rounded-md object-contain"
+          />
+          <div className="flex-1 space-y-1.5">
+            <h3 className="text-sm font-medium uppercase">{item.name}</h3>
+            <p className="text-xs text-gray-500">
+              {item.is_sofadeal_coverage
+                ? "Complete coverage provided by SofaDeal"
+                : `${item.loxa_complimentary_years}-Year complimentary protection`}
+            </p>
+            <div className="flex justify-end pt-1">
+              <p className="text-sm font-semibold text-green-600">FREE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (item['loxa-insurance-code'] || item.insurance_price) {
     return (
       <div className="rounded-md border bg-white/30 p-3">
         <div className="flex gap-3">
-          <div className="h-16 w-16 rounded-md bg-black flex items-center justify-center">
-            <span className="text-white font-bold text-sm">LOXA</span>
-          </div>
+          <img
+            src="/loxa.png"
+            alt="Loxa"
+            className="h-16 w-16 rounded-md object-contain"
+          />
           <div className="flex-1 space-y-1.5">
             <div className="flex justify-between">
               <h3 className="text-sm font-medium uppercase">
