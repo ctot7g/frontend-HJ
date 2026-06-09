@@ -642,35 +642,57 @@ export function Navbar() {
                             className="hover:bg-muted/50 flex items-center gap-3 rounded-md p-2"
                           >
                             <div className="bg-muted relative h-12 w-12 overflow-hidden rounded border">
-                              {item.image && (
+                              {(item['loxa-insurance-code'] ||
+                                item.insurance_price ||
+                                item.loxa_complimentary_years ||
+                                item.is_sofadeal_coverage) ? (
+                                <img
+                                  src="/loxa.png"
+                                  alt="Loxa"
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : item.image ? (
                                 <Image
                                   fill
                                   src={item.image}
                                   alt={item.name}
                                   className="bg-white object-contain"
                                 />
-                              )}
+                              ) : null}
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="font-open-sans truncate text-sm font-medium">
                                 {item.name}
                               </p>
-                              <div className="flex items-center gap-2">
-                                <p className="text-muted-foreground font-open-sans text-sm">
-                                  £{item.price.toFixed(2)} x {item.quantity}
+                              {(item['loxa-insurance-code'] ||
+                                item.insurance_price ||
+                                item.loxa_complimentary_years ||
+                                item.is_sofadeal_coverage) ? (
+                                <p className="font-open-sans text-sm text-green-600 font-medium">
+                                  {item.price > 0
+                                    ? `£${item.price.toFixed(2)}`
+                                    : "FREE"}
                                 </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <p className="text-muted-foreground font-open-sans text-sm">
-                                  ⌚ Delivery: {item.delivery_time_days}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <p className="text-muted-foreground font-open-sans text-sm">
-                                  Assembly Required:{" "}
-                                  {item.assembly_required ? "✔️" : "❌"}
-                                </p>
-                              </div>
+                              ) : (
+                                <>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-muted-foreground font-open-sans text-sm">
+                                      £{item.price.toFixed(2)} x {item.quantity}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-muted-foreground font-open-sans text-sm">
+                                      ⌚ Delivery: {item.delivery_time_days}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-muted-foreground font-open-sans text-sm">
+                                      Assembly Required:{" "}
+                                      {item.assembly_required ? "✔️" : "❌"}
+                                    </p>
+                                  </div>
+                                </>
+                              )}
                             </div>
                             <Button
                               variant="ghost"
