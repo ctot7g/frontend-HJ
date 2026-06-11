@@ -243,9 +243,14 @@ export function LoxaInsuranceWidget({
   const addons = insuranceData.insurances.filter(
     (i: LoxaInsurance) => i.pricing_type === "addon",
   );
+  // const inclusiveBase = insuranceData.insurances.find(
+  //   (i: LoxaInsurance) => i.is_base_insurance_product,
+  // );
   const inclusiveBase = insuranceData.insurances.find(
     (i: LoxaInsurance) => i.is_base_insurance_product,
-  );
+  ) || insuranceData.insurances.find(
+    (i: LoxaInsurance) => i.pricing_type === "inclusive",
+  ) || insuranceData.insurances[0];
   const extensions = insuranceData.insurances.filter(
     (i: LoxaInsurance) => !i.is_base_insurance_product,
   );
@@ -589,9 +594,13 @@ export function LoxaInsuranceWidget({
     return (
       <div className="mt-4 space-y-2">
         {!isOptedOut ? (
-          <div className="rounded-xl border-2 border-green-400 bg-green-50 p-4">
+          <div className="rounded-xl border-2 p-4">
             <div className="flex items-start gap-3">
-              <Shield className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
+              <img
+                src="/loxa.png"
+                alt="Loxa"
+                className="h-5 w-5 object-contain mt-[3px] shrink-0"
+              />
               <div className="flex-1">
                 <span className="text-sm font-semibold text-gray-800">
                   {inclusiveBase.insurance_term}-Year Protection Included Free
