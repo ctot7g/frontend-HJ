@@ -638,7 +638,7 @@ const proceedToAddToCart = () => {
         updated_at: new Date().toISOString(),
       });
       calculateTotals();
-    } else if (product.loxa_complimentary_years && product.loxa_complimentary_years > 0 && !selectedInsurance) {
+    } else if ((product.show_loxa ?? true) && product.loxa_complimentary_years && product.loxa_complimentary_years > 0 && !selectedInsurance) {
       // Free complimentary years — display only
       addItemLocally({
         id: `loxa-free-${currentVariant.id}`,
