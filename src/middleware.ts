@@ -1,23 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 // This function can be marked `async` if using `await` inside
-export function middleware() {
-  // Get the path from the request URL
-  // const path = request.nextUrl.pathname;
+export function middleware(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const ref = searchParams.get('ref');
 
-  // The auth routes are handled by the route group with its own layout
-  // We don't need to do anything special for auth routes
-  // But we can add additional redirects if needed
+  if (ref) {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete('ref');
 
-  // Profile page and other protected routes can be handled here
-  // For example, if a user is not authenticated, redirect to login
-
-  // const token = request.cookies.get('authToken')?.value;
-  //
-  // // If trying to access a protected route without authentication
-  // if (path === '/profile' && !token) {
-  //   return NextResponse.redirect(new URL('/login', request.url));
-  // }
+    const response = NextResponse.redirect(url);
+    response.cookies.set('ref_code', ref, {
+      httpOnly: false,
+      maxAge: 60 * 60 * 24 * 90,
+      path: '/',
+      sameSite: 'lax',
+    });
+    return response;
+  }
 
   return NextResponse.next();
 }

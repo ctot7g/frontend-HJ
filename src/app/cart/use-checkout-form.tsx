@@ -88,6 +88,16 @@ export function useCheckoutForm() {
   const [referralCredit, setReferralCredit] = React.useState(0);
   const [referralDiscount, setReferralDiscount] = React.useState(0);
 
+  React.useEffect(() => {
+  const match = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('ref_code='));
+  if (match) {
+    const code = match.split('=')[1];
+    if (code) setCouponCode(code);
+  }
+}, []);
+
   const totalPrice = React.useMemo(() => getCartTotal(), [getCartTotal, items]);
 
   // Final total = cart - coupon - wallet - old referral credit
@@ -365,12 +375,12 @@ export function useCheckoutForm() {
 
       if (data.is_referral) {
         toast.success(
-  `Referral code applied! You get ${
-    data.discount_type === 'fixed'
-      ? `£${data.discount_value} off`
-      : `${data.discount_value}% off`
-  }`
-);
+          `Referral code applied! You get ${
+            data.discount_type === 'fixed'
+            ? `£${data.discount_value} off`
+            : `${data.discount_value}% off`
+          }`
+        );
       }
     } catch (err: any) {
       setCouponError(err.message);
