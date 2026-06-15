@@ -88,15 +88,64 @@ export function useCheckoutForm() {
   const [referralCredit, setReferralCredit] = React.useState(0);
   const [referralDiscount, setReferralDiscount] = React.useState(0);
 
-  React.useEffect(() => {
-  const match = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('ref_code='));
-  if (match) {
-    const code = match.split('=')[1];
-    if (code) setCouponCode(code);
-  }
-}, []);
+//   React.useEffect(() => {
+//   const match = document.cookie
+//     .split('; ')
+//     .find((row) => row.startsWith('ref_code='));
+//   if (match) {
+//     const code = match.split('=')[1];
+//     if (code) setCouponCode(code);
+//   }
+// }, []);
+
+React.useEffect(() => {
+  if (!session?.access_token) return;
+
+  const autoApplyRef = async () => {
+    const match = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('ref_code='));
+    if (!match || appliedCoupon) return;
+
+    const code = decodeURIComponent(match.split('=')[1]);
+    if (!code) return;
+
+    try {
+      // Check own referral code first
+      const ownRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/user/referral-code`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const ownData = await ownRes.json();
+      if (ownData.referral_code === code) return; // own code — skip
+
+      // Someone else's code — auto-fill and apply
+      setCouponCode(code);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/apply`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAppliedCoupon({
+          id: data.id,
+          code: data.code,
+          discount_type: data.discount_type,
+          discount_value: data.discount_value,
+          is_referral: data.is_referral || false,
+          referrer_id: data.referrer_id,
+        });
+      }
+    } catch (err) {
+      console.error('Auto-apply referral failed:', err);
+    }
+  };
+
+  autoApplyRef();
+}, [session]);
 
   const totalPrice = React.useMemo(() => getCartTotal(), [getCartTotal, items]);
 

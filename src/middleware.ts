@@ -6,18 +6,15 @@ export function middleware(request: NextRequest) {
   const ref = searchParams.get('ref');
 
   if (ref) {
-    const url = request.nextUrl.clone();
-    url.searchParams.delete('ref');
-
-    const response = NextResponse.redirect(url);
-    response.cookies.set('ref_code', ref, {
-      httpOnly: false,
-      maxAge: 60 * 60 * 24 * 90,
-      path: '/',
-      sameSite: 'lax',
-    });
-    return response;
-  }
+  const response = NextResponse.next();
+  response.cookies.set('ref_code', ref, {
+    httpOnly: false,
+    maxAge: 60 * 60 * 24 * 90,
+    path: '/',
+    sameSite: 'lax',
+  });
+  return response;
+}
 
   return NextResponse.next();
 }

@@ -58,12 +58,13 @@ export default function ReferralPage() {
   }, [user]);
 
   const handleCopy = () => {
-    if (!data?.referral_code) return;
-    navigator.clipboard.writeText(data.referral_code);
-    setCopied(true);
-    toast.success("Referral code copied!");
-    setTimeout(() => setCopied(false), 2000);
-  };
+  if (!data?.referral_code) return;
+  const referralUrl = `https://www.sofadeal.co.uk/?ref=${data.referral_code}`;
+  navigator.clipboard.writeText(referralUrl);
+  setCopied(true);
+  toast.success("Referral link copied!");
+  setTimeout(() => setCopied(false), 2000);
+};
 
   if (!user) {
     return (

@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/providers/auth-provider";
 // import "@/components/ui/modern-image-gallery.css";
 import { useProduct, useRelatedProducts } from "@/hooks/use-products";
 import { useCartAnimationStore, useCartStore } from "@/lib/store/cart-store";
@@ -339,6 +340,63 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
   const { isInWishlist, toggleItem } = useWishlistStore();
 
   const router = useRouter()
+
+  const { user, session } = useAuth();
+
+// useEffect(() => {
+//   if (!session?.access_token) return;
+
+//   const existingRef = new URLSearchParams(window.location.search).get('ref');
+//   if (existingRef) return; // someone else's ref in URL — leave it alone
+
+//   const appendOwnRefCode = async () => {
+//     try {
+//       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/user/referral-code`, {
+//         headers: { Authorization: `Bearer ${session.access_token}` },
+//       });
+//       if (!res.ok) return;
+//       const data = await res.json();
+//       if (data.referral_code) {
+//         const url = new URL(window.location.href);
+//         url.searchParams.set('ref', data.referral_code);
+//         window.history.replaceState({}, '', url.toString());
+//       }
+//     } catch (err) {
+//       console.error('Failed to fetch own referral code:', err);
+//     }
+//   };
+
+//   appendOwnRefCode();
+// }, [session]);
+
+useEffect(() => {
+  if (!session?.access_token) return;
+
+  const existingRef = new URLSearchParams(window.location.search).get('ref');
+  if (existingRef) return; // someone else's ref — leave it alone
+
+  const appendOwnRefCode = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/user/referral-code`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.referral_code) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('ref', data.referral_code);
+        window.history.replaceState({}, '', url.toString());
+
+        // Clear the ref_code cookie so own ref doesn't auto-apply in cart
+        document.cookie = 'ref_code=; Max-Age=0; path=/;';
+      }
+    } catch (err) {
+      console.error('Failed to fetch own referral code:', err);
+    }
+  };
+
+  appendOwnRefCode();
+}, [session]);
 
   // ── scroll spy ────────────────────────────────────────────────
   useEffect(() => {
