@@ -3,10 +3,10 @@ import { ApiService } from "@/lib/api-service";
 export interface HeroSettings {
   id: number;
   image_url: string | null;
+  hero_images: string[];
   width: number;
   height: number;
   label: string;
-  hero_text: string;
   updated_at: string;
 }
 
@@ -62,14 +62,39 @@ export const DimensionsApi = {
     return res.json();
   },
 
-  updateHeroText: async (heroText: string): Promise<HeroSettings> => {
-    const res = await ApiService.fetchWithAuth("/dimensions/hero-text", {
-      method: "PATCH",
-      body: JSON.stringify({ hero_text: heroText }),
+uploadHeroImage: async (file: File): Promise<HeroSettings> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await ApiService.fetchWithAuth("/dimensions/hero-images", {
+      method: "POST",
+      body: formData,
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.message || "Failed to update hero text");
+      throw new Error(err.message || "Upload failed");
+    }
+    return res.json();
+  },
+
+  deleteHeroImage: async (index: number): Promise<HeroSettings> => {
+    const res = await ApiService.fetchWithAuth(`/dimensions/hero-images/${index}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Delete failed");
+    }
+    return res.json();
+  },
+
+  reorderHeroImages: async (images: string[]): Promise<HeroSettings> => {
+    const res = await ApiService.fetchWithAuth("/dimensions/hero-images/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ images }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Reorder failed");
     }
     return res.json();
   },

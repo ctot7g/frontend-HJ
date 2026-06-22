@@ -30,10 +30,15 @@ export default function DimensionsPage() {
   const [width, setWidth] = useState(1200);
   const [height, setHeight] = useState(800);
   const [label, setLabel] = useState("Hero Image");
-  const [heroText, setHeroText] = useState('');
-  const [isSavingText, setIsSavingText] = useState(false);
+  // const [heroText, setHeroText] = useState('');
+  // const [isSavingText, setIsSavingText] = useState(false);
+
+  // const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingHeroImage, setIsUploadingHeroImage] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -47,7 +52,6 @@ export default function DimensionsPage() {
       setWidth(data.width);
       setHeight(data.height);
       setLabel(data.label);
-      setHeroText(data.hero_text || '');
       if (data.image_url) setPreviewUrl(data.image_url);
     } catch (err) {
       toast.error("Failed to load settings");
@@ -56,18 +60,7 @@ export default function DimensionsPage() {
     }
   };
 
-  const handleSaveHeroText = async () => {
-  if (!heroText.trim()) { toast.error('Text cannot be empty'); return; }
-  setIsSavingText(true);
-  try {
-    await DimensionsApi.updateHeroText(heroText);
-    toast.success('Banner text saved!');
-  } catch (err: any) {
-    toast.error(err.message || 'Failed to save');
-  } finally {
-    setIsSavingText(false);
-  }
-};
+
 
   const handleFileSelect = async (file: File) => {
     if (!file) return;
@@ -129,6 +122,41 @@ export default function DimensionsPage() {
     }
   };
 
+  // const applyPreset = (preset: { width: number; height: number; label: string }) => {
+  //   setWidth(preset.width);
+  //   setHeight(preset.height);
+  //   setLabel(preset.label);
+  // };
+
+  const handleUploadHeroImage = async (file: File) => {
+    if (!file) return;
+    setIsUploadingHeroImage(true);
+    try {
+      const updated = await DimensionsApi.uploadHeroImage(file);
+      setSettings(updated);
+      toast.success('Image added!');
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setIsUploadingHeroImage(false);
+      if (heroImageInputRef.current) heroImageInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteHeroImage = async (index: number) => {
+    if (!confirm('Remove this image from the slideshow?')) return;
+    setDeletingIndex(index);
+    try {
+      const updated = await DimensionsApi.deleteHeroImage(index);
+      setSettings(updated);
+      toast.success('Image removed');
+    } catch (err: any) {
+      toast.error(err.message || 'Delete failed');
+    } finally {
+      setDeletingIndex(null);
+    }
+  };
+
   const applyPreset = (preset: { width: number; height: number; label: string }) => {
     setWidth(preset.width);
     setHeight(preset.height);
@@ -153,16 +181,16 @@ export default function DimensionsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-        {/* LEFT: Upload Section */}
+        
         <div className="space-y-4">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-base font-semibold text-gray-800">
               Hero Image
             </h2>
 
-            {/* Drop Zone */}
+            
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -229,7 +257,7 @@ export default function DimensionsPage() {
               }}
             />
 
-            {/* Upload / Delete buttons */}
+            
             <div className="mt-4 flex gap-3">
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -256,7 +284,7 @@ export default function DimensionsPage() {
               )}
             </div>
 
-            {/* Current image URL */}
+            
             {settings?.image_url && (
               <div className="mt-3 rounded-lg bg-gray-50 p-3">
                 <p className="text-xs font-medium text-gray-500">Current URL</p>
@@ -268,8 +296,13 @@ export default function DimensionsPage() {
           </div>
         </div>
 
-        {/* RIGHT: Dimensions Section */}
-        <div className="space-y-4">
+        
+        <div className="space-y-4"> */}
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-1">
+
+          {/* Dimensions Section */}
+          <div className="space-y-4">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-base font-semibold text-gray-800">
               Display Dimensions
@@ -387,23 +420,93 @@ export default function DimensionsPage() {
           )}
         </div>
       </div>
+      {/* Slideshow Images */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-3 text-base font-semibold text-gray-800">Banner Text</h2>
-        <textarea
-          value={heroText}
-          onChange={(e) => setHeroText(e.target.value)}
-          rows={5}
-          placeholder="Enter hero banner text..."
-          className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm leading-relaxed focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-gray-800">Slideshow Images</h2>
+            <p className="mt-0.5 text-xs text-gray-400">
+              {settings?.hero_images?.length ?? 0} / 4 images — cycles every 3 seconds
+            </p>
+          </div>
+          {(settings?.hero_images?.length ?? 0) < 4 && (
+            <button
+              onClick={() => heroImageInputRef.current?.click()}
+              disabled={isUploadingHeroImage}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+            >
+              {isUploadingHeroImage ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Upload size={14} />
+              )}
+              {isUploadingHeroImage ? 'Uploading...' : 'Add Image'}
+            </button>
+          )}
+        </div>
+
+        <input
+          ref={heroImageInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleUploadHeroImage(file);
+          }}
         />
-        <button
-          onClick={handleSaveHeroText}
-          disabled={isSavingText}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
-        >
-          {isSavingText ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          {isSavingText ? 'Saving...' : 'Save Banner Text'}
-        </button>
+
+        {(settings?.hero_images?.length ?? 0) === 0 ? (
+          <div
+            onClick={() => heroImageInputRef.current?.click()}
+            className="flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100 transition-colors"
+          >
+            <ImageIcon className="h-10 w-10 text-gray-300" />
+            <p className="mt-2 text-sm text-gray-500">Click to add your first slideshow image</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {settings!.hero_images.map((url, index) => (
+              <div key={url} className="group relative rounded-lg overflow-hidden border border-gray-200">
+                <div className="relative aspect-video w-full bg-gray-100">
+                  <Image
+                    src={url}
+                    alt={`Slide ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleDeleteHeroImage(index)}
+                    disabled={deletingIndex === index}
+                    className="rounded-full bg-red-600 p-1.5 text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {deletingIndex === index ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={14} />
+                    )}
+                  </button>
+                </div>
+                <div className="bg-white px-2 py-1">
+                  <p className="text-xs text-gray-500">Slide {index + 1}</p>
+                </div>
+              </div>
+            ))}
+            {/* Empty slots */}
+            {Array.from({ length: 4 - (settings?.hero_images?.length ?? 0) }).map((_, i) => (
+              <div
+                key={`empty-${i}`}
+                onClick={() => heroImageInputRef.current?.click()}
+                className="flex aspect-video cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+              >
+                <Upload size={16} className="text-gray-300" />
+                <p className="mt-1 text-xs text-gray-400">Add</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

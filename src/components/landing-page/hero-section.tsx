@@ -5,8 +5,16 @@ import Image from "next/image";
 import { MarqueeStrip } from "../marquee-strip";
 import { Button } from "../button-custom";
 
+const SLIDE_INTERVAL = 3000;
+const FALLBACK_IMAGE = '/hero-img1.png';
+
 const HeroSection = () => {
-  const [heroSettings, setHeroSettings] = useState<{ image_url: string | null; width: number; height: number; hero_text: string } | null>(null);
+const [heroSettings, setHeroSettings] = useState<{
+  hero_images: string[];
+  width: number;
+  height: number;
+} | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/dimensions`)
@@ -15,11 +23,19 @@ const HeroSection = () => {
       .catch(() => {});
   }, []);
 
-  // const imageSrc = heroSettings?.image_url || "/hero-img1.png";
-  const imageSrc =
-  heroSettings?.image_url && heroSettings.image_url.trim() !== ""
-    ? heroSettings.image_url
-    : "/hero-img1.png";
+  const slides: string[] = heroSettings?.hero_images?.length
+  ? heroSettings.hero_images
+  : [FALLBACK_IMAGE];
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const imageSrc = slides[currentSlide];
 
   // Marquee items data
   const marqueeItems = [
@@ -70,8 +86,7 @@ const HeroSection = () => {
         <div className="relative h-[50vh] overflow-hidden md:min-h-[650px] lg:min-h-[500px] 
         lg:mb-[-4rem] 2xl:min-h-[1000px]">
           {/* Hero Image - Background for entire section */}
-          {heroSettings !== null && (
-            <div className="absolute inset-0 ml-0 h-full lg:max-h-[90vh] w-full sm:ml-[15px] xl:ml-[18px] 
+          <div className="absolute inset-0 ml-0 h-full lg:max-h-[90vh] w-full sm:ml-[15px] xl:ml-[18px] 
             2xl:ml-[21px] flex items-center justify-center">
               {heroSettings?.width && heroSettings?.height ? (
                 <Image
@@ -79,7 +94,7 @@ const HeroSection = () => {
                   alt="Sofa Deals Hero"
                   width={heroSettings.width}
                   height={heroSettings.height}
-                  className="mx-auto object-contain"
+                  className="mx-auto object-contain transition-opacity duration-500"
                   priority
                 />
               ) : (
@@ -87,25 +102,34 @@ const HeroSection = () => {
                   src={imageSrc}
                   alt="Sofa Deals Hero"
                   fill
-                  className="h-[90vh] object-contain object-center"
+                  className="h-[90vh] object-contain object-center transition-opacity duration-500"
                   priority
                 />
               )}
+
+              {/* Slide indicator dots */}
+              {slides.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+                  {slides.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentSlide(i)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        i === currentSlide
+                          ? 'w-6 bg-white'
+                          : 'w-2 bg-white/50 hover:bg-white/75'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
 
           {/* Content Overlay with responsive padding */}
           <div className="relative z-10 h-full px-4 sm:px-6 lg:px-9">
             <div className="grid h-full grid-cols-1 lg:grid-cols-2">
               {/* Left Side - Content */}
               <div className="flex flex-col justify-between py-4 sm:py-6 md:py-8 lg:py-2">
-                {/* Top Left Text */}
-                <div className="max-w-full p-4 sm:max-w-sm lg:max-w-[430px]">
-                  <p className="font-open-sans text-gray mt-10 text-sm leading-[26px] md:text-base lg:mt-0 lg:text-base">
-                    {heroSettings?.hero_text || "Do you need a perfect sofa set? Do you want a cosy sofa that feels like it was made just for you? That's exactly the vibe Sofa Deal brings, offering sofa deals you can't resist."}
-                  </p>
-                </div>
-
                 {/* Empty space for visual balance on desktop */}
                 <div className="hidden lg:block"></div>
               </div>
