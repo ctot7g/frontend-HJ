@@ -20,7 +20,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ChevronRight, Package, ChevronLeft, BadgePoundSterling, Calculator, WalletCards } from "lucide-react";
+import { ChevronRight, Package, Truck, ChevronLeft, BadgePoundSterling, Calculator, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product-card";
@@ -913,9 +913,10 @@ const proceedToAddToCart = () => {
               <h1 className="text-dark-gray text-[32px] leading-tight uppercase md:text-[48px]">
                 {product.name}
               </h1>
-              <Badge className="rounded-full bg-[#56748e] px-3 py-1 text-[14px] text-white md:px-6 md:py-2 md:text-[18px] lg:text-[20px]">
-                {getDeliveryDetails()}
-              </Badge>
+              <Badge className="flex items-center gap-2 rounded-full bg-[#56748e] px-3 py-1 text-[14px] text-white md:px-6 md:py-2 md:text-[18px] lg:text-[20px]">
+  <Truck className="h-6 w-6 md:h-7 md:w-7" />
+  {getDeliveryDetails()}
+</Badge>
             </div>
           )}
 
@@ -1122,9 +1123,10 @@ const proceedToAddToCart = () => {
                   <h1 className="text-dark-gray text-[32px] leading-tight uppercase md:text-[48px] lg:text-[56px]">
                     {product.name}
                   </h1>
-                  <Badge className="rounded-full bg-[#56748e] px-3 py-1 text-[14px] text-white md:px-6 md:py-2 md:text-[18px] lg:text-[20px]">
-                    {getDeliveryDetails()}
-                  </Badge>
+                  <Badge className="flex items-center gap-2 rounded-full bg-[#56748e] px-3 py-1 text-[14px] text-white md:px-6 md:py-2 md:text-[18px] lg:text-[20px]">
+  <Truck className="h-6 w-6 md:h-7 md:w-7" />
+  {getDeliveryDetails()}
+</Badge>
                 </div>
               )}
 

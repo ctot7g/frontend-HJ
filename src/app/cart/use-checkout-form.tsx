@@ -88,17 +88,16 @@ export function useCheckoutForm() {
   const [referralCredit, setReferralCredit] = React.useState(0);
   const [referralDiscount, setReferralDiscount] = React.useState(0);
 
-//   React.useEffect(() => {
-//   const match = document.cookie
-//     .split('; ')
-//     .find((row) => row.startsWith('ref_code='));
-//   if (match) {
-//     const code = match.split('=')[1];
-//     if (code) setCouponCode(code);
-//   }
-// }, []);
-
 React.useEffect(() => {
+  // Priority 1: ?ref= from URL (works for both guests and logged-in)
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get("ref");
+  if (refCode && !appliedCoupon) {
+    setCouponCode(refCode);
+    return; // URL param takes priority, skip cookie
+  }
+
+  // Priority 2: ref_code cookie (logged-in auto-apply only)
   if (!session?.access_token) return;
 
   const autoApplyRef = async () => {
@@ -111,14 +110,12 @@ React.useEffect(() => {
     if (!code) return;
 
     try {
-      // Check own referral code first
       const ownRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/user/referral-code`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const ownData = await ownRes.json();
-      if (ownData.referral_code === code) return; // own code — skip
+      if (ownData.referral_code === code) return;
 
-      // Someone else's code — auto-fill and apply
       setCouponCode(code);
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/apply`, {
         method: "POST",
@@ -279,10 +276,6 @@ React.useEffect(() => {
     window.location.href = "/login";
   };
 
-  // const getCountryCode = (country: string): string => {
-  //   const countryMap: Record<string, string> = { us: "US", uk: "GB", ca: "CA" };
-  //   return countryMap[country] || "GB";
-  // };
 
   const getCountryCode = (country: string): string => {
     const countryMap: Record<string, string> = { 
@@ -292,42 +285,56 @@ React.useEffect(() => {
     return countryMap[country] || country;
   };
 
-  // After order placed — process referral reward and consume wallet
   const handlePostOrderActions = async (orderId: string) => {
-    if (!user) return;
-
-    try {
-      // 1. If referral code was used — give referrer £500 wallet credit
-      if (appliedCoupon?.is_referral && appliedCoupon.code) {
-        await ApiService.fetchWithAuth("/coupons/user/process-referral-reward", {
-          method: "POST",
-          body: JSON.stringify({
-            referral_code: appliedCoupon.code,
-            order_id: orderId,
-            discount_given: discountAmount,
-            order_total: totalPrice,
-          }),
-        });
-      }
-
-      // 2. Consume wallet balance that was used
-      if (useWallet && walletDiscount > 0) {
-        await ApiService.fetchWithAuth("/coupons/user/consume-wallet", {
-          method: "POST",
-          body: JSON.stringify({ amount: walletDiscount }),
-        });
-      }
-
-      // 3. Consume old referral credit if used
-      if (referralCredit > 0 && referralDiscount > 0) {
-        await ApiService.fetchWithAuth("/coupons/user/consume-referral-credit", {
-          method: "POST",
-        });
-      }
-    } catch (err) {
-      console.error("Post order actions failed (non-critical):", err);
+  try {
+    // Guest referral
+    if (appliedCoupon?.is_referral && appliedCoupon.code && !user) {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/process-guest-referral`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          referral_code: appliedCoupon.code,
+          order_id: orderId,
+          discount_given: discountAmount,
+          order_total: totalPrice,
+          guest_email: formData.email,       // ← this is key
+          guest_name: `${formData.firstName} ${formData.lastName}`,
+        }),
+      });
+      return;
     }
-  };
+    if (!user) return;
+    // ... rest of logged-in actions
+
+    // Logged-in user referral reward
+    if (appliedCoupon?.is_referral && appliedCoupon.code) {
+      await ApiService.fetchWithAuth("/coupons/user/process-referral-reward", {
+        method: "POST",
+        body: JSON.stringify({
+          referral_code: appliedCoupon.code,
+          order_id: orderId,
+          discount_given: discountAmount,
+          order_total: totalPrice,
+        }),
+      });
+    }
+
+    if (useWallet && walletDiscount > 0) {
+      await ApiService.fetchWithAuth("/coupons/user/consume-wallet", {
+        method: "POST",
+        body: JSON.stringify({ amount: walletDiscount }),
+      });
+    }
+
+    if (referralCredit > 0 && referralDiscount > 0) {
+      await ApiService.fetchWithAuth("/coupons/user/consume-referral-credit", {
+        method: "POST",
+      });
+    }
+  } catch (err) {
+    console.error("Post order actions failed (non-critical):", err);
+  }
+};
 
   const handleCODSuccess = async (codResponse: { order_id: string }) => {
     await handlePostOrderActions(codResponse.order_id);
@@ -386,59 +393,58 @@ React.useEffect(() => {
     redirectToPayment(paymentResponse);
   };
 
-  const applyCoupon = async () => {
-    if (!couponCode.trim()) return;
+ const applyCoupon = async (guestEmail?: string, codeOverride?: string) => {
+  const code = codeOverride || couponCode.trim();
+  if (!code) return;
 
-    setIsApplyingCoupon(true);
+  setIsApplyingCoupon(true);
+  setCouponError("");
+
+  try {
+    const token = session?.access_token;
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/apply`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        code,
+        ...(guestEmail ? { guest_email: guestEmail } : {}),
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Invalid or expired coupon code");
+
+    setAppliedCoupon({
+      id: data.id,
+      code: data.code,
+      discount_type: data.discount_type,
+      discount_value: data.discount_value,
+      is_referral: data.is_referral || false,
+      referrer_id: data.referrer_id,
+    });
     setCouponError("");
 
-    try {
-      const token = session?.access_token;
-      if (!token) throw new Error("You must be logged in to apply a coupon");
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/apply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ code: couponCode.trim() }),
-      });
-
-      const data = await res.json();
-      
-
-      if (!res.ok) {
-        throw new Error(data.message || "Invalid or expired coupon");
-      }
-
-      setAppliedCoupon({
-        id: data.id,
-        code: data.code,
-        discount_type: data.discount_type,
-        discount_value: data.discount_value,
-        is_referral: data.is_referral || false,
-        referrer_id: data.referrer_id,
-      });
-      setCouponError("");
-
-      if (data.is_referral) {
-        toast.success(
-          `Referral code applied! You get ${
-            data.discount_type === 'fixed'
+    if (data.is_referral) {
+      toast.success(
+        `Referral code applied! You get ${
+          data.discount_type === "fixed"
             ? `£${data.discount_value} off`
             : `${data.discount_value}% off`
-          }`
-        );
-      }
-    } catch (err: any) {
-      setCouponError(err.message);
-      setAppliedCoupon(null);
-      setDiscountAmount(0);
-    } finally {
-      setIsApplyingCoupon(false);
+        }`
+      );
     }
-  };
+  } catch (err: any) {
+    setCouponError(err.message);
+    setAppliedCoupon(null);
+    setDiscountAmount(0);
+  } finally {
+    setIsApplyingCoupon(false);
+  }
+};
 
   const removeCoupon = () => {
     setAppliedCoupon(null);

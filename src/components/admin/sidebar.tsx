@@ -22,6 +22,7 @@ import {
   Truck,
   Percent,
   FileText,
+  ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/providers/auth-provider";
@@ -84,6 +85,11 @@ export const adminNavItems = [
     title: "Banner",
     href: "/admin/dimensions",
     icon: <Ruler className="mr-3 h-5 w-5" />,
+  },
+   {
+    title: "Products Hero",
+    href: "/admin/products-hero",
+    icon: <ImageIcon className="mr-3 h-5 w-5" />,
   },
   {
     title: "Content",

@@ -29,7 +29,7 @@ interface EmailTabProps {
     discountAmount: number;
     isApplyingCoupon: boolean;
     couponError: string;
-    applyCoupon: () => Promise<void>;
+   applyCoupon: (guestEmail?: string, codeOverride?: string) => Promise<void>;
     removeCoupon: () => void;
   };
 }
@@ -91,31 +91,27 @@ export const EmailTab = ({
     window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`;
   };
 
-  const handleApplyCoupon = async () => {
-    if (!localCouponCode.trim()) {
-      toast.error("Please enter a coupon code");
-      return;
-    }
-    setCouponCode(localCouponCode);
-    await applyCoupon();
-  };
+ const handleApplyCoupon = async () => {
+  if (!localCouponCode.trim()) { toast.error("Please enter a coupon code"); return; }
+  setCouponCode(localCouponCode);
+  await applyCoupon(!user ? formData.email || undefined : undefined, localCouponCode);
+};
 
   const handleRemoveCoupon = () => {
     removeCoupon();
     setLocalCouponCode("");
   };
 
-  const handleNext = () => {
-    if (!formData.email) {
-      toast.error("Email is required");
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-    onNext();
-  };
+const handleNext = async () => {
+  if (!formData.email) { toast.error("Email is required"); return; }
+  if (!/\S+@\S+\.\S+/.test(formData.email)) { toast.error("Please enter a valid email address"); return; }
+
+  if (!user && couponCode && !appliedCoupon) {
+    await applyCoupon(formData.email, couponCode);
+  }
+
+  onNext();
+};
 
   return (
     <div className="px-0.5 md:px-8">

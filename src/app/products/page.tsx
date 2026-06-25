@@ -384,7 +384,7 @@ function ProductsContent() {
         items={marqueeItems}
         backgroundColor="bg-blue"
         textColor="text-white"
-        className="py-3 sm:py-4 md:mt-[-70px] 2xl:mt-[0px]"
+        className="py-3 sm:py-4"
       />
 
       <div className="bg-gray-50 py-8 md:py-12">
