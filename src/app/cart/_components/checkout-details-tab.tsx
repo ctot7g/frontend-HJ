@@ -30,7 +30,7 @@ interface CheckoutDetailsTabProps {
     discountAmount: number;
     isApplyingCoupon: boolean;
     couponError: string;
-    applyCoupon: () => Promise<void>;
+    applyCoupon: (guestEmail?: string, codeOverride?: string) => Promise<boolean>;
     removeCoupon: () => void;
   };
   referralCredit: number;

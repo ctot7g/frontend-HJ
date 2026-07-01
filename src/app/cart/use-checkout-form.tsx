@@ -289,20 +289,33 @@ React.useEffect(() => {
   try {
     // Guest referral
     if (appliedCoupon?.is_referral && appliedCoupon.code && !user) {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/process-guest-referral`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          referral_code: appliedCoupon.code,
-          order_id: orderId,
-          discount_given: discountAmount,
-          order_total: totalPrice,
-          guest_email: formData.email,       // ← this is key
-          guest_name: `${formData.firstName} ${formData.lastName}`,
-        }),
-      });
-      return;
-    }
+  const guestEmail = formData.email?.trim().toLowerCase();
+  const guestName = `${formData.firstName} ${formData.lastName}`.trim();
+
+  if (!guestEmail) {
+    console.error("Guest email missing — cannot record referral use");
+    return;
+  }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/process-guest-referral`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      referral_code: appliedCoupon.code,
+      order_id: orderId,
+      discount_given: discountAmount,
+      order_total: totalPrice,
+      guest_email: guestEmail,
+      guest_name: guestName,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.error("process-guest-referral failed:", err);
+  }
+  return;
+}
     if (!user) return;
     // ... rest of logged-in actions
 
@@ -393,9 +406,9 @@ React.useEffect(() => {
     redirectToPayment(paymentResponse);
   };
 
- const applyCoupon = async (guestEmail?: string, codeOverride?: string) => {
+ const applyCoupon = async (guestEmail?: string, codeOverride?: string): Promise<boolean> => {
   const code = codeOverride || couponCode.trim();
-  if (!code) return;
+  if (!code) return false;
 
   setIsApplyingCoupon(true);
   setCouponError("");
@@ -437,10 +450,12 @@ React.useEffect(() => {
         }`
       );
     }
+    return true;
   } catch (err: any) {
     setCouponError(err.message);
     setAppliedCoupon(null);
     setDiscountAmount(0);
+    return false;
   } finally {
     setIsApplyingCoupon(false);
   }

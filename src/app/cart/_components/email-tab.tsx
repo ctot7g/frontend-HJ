@@ -29,7 +29,7 @@ interface EmailTabProps {
     discountAmount: number;
     isApplyingCoupon: boolean;
     couponError: string;
-   applyCoupon: (guestEmail?: string, codeOverride?: string) => Promise<void>;
+    applyCoupon: (guestEmail?: string, codeOverride?: string) => Promise<boolean>;
     removeCoupon: () => void;
   };
 }
@@ -106,8 +106,14 @@ const handleNext = async () => {
   if (!formData.email) { toast.error("Email is required"); return; }
   if (!/\S+@\S+\.\S+/.test(formData.email)) { toast.error("Please enter a valid email address"); return; }
 
-  if (!user && couponCode && !appliedCoupon) {
-    await applyCoupon(formData.email, couponCode);
+  if (!user && appliedCoupon?.is_referral) {
+    const success = await applyCoupon(formData.email, appliedCoupon.code);
+    if (!success) {
+      return; // couponError is already set and shown in the UI, block progression
+    }
+  } else if (!user && couponCode && !appliedCoupon) {
+    const success = await applyCoupon(formData.email, couponCode);
+    if (!success) return;
   }
 
   onNext();
