@@ -85,7 +85,7 @@ const [heroSettings, setHeroSettings] = useState<{
 
 
         <div className="relative h-[33vh] sm:h-[40vh] md:min-h-[650px] lg:min-h-[500px] lg:mb-[-4rem] 
-        2xl:min-h-[1000px]">
+          2xl:min-h-[1000px] lg:overflow-hidden">
           {/* Hero Image - Background for entire section */}
           <div className="absolute inset-0 ml-0 h-full lg:max-h-[90vh] w-full sm:ml-[15px] xl:ml-[18px] 
             2xl:ml-[21px] flex items-center justify-center">
@@ -95,7 +95,7 @@ const [heroSettings, setHeroSettings] = useState<{
                   alt="Sofa Deals Hero"
                   width={heroSettings.width}
                   height={heroSettings.height}
-                  className="mx-auto object-contain transition-opacity duration-500"
+                  className="mx-auto object-contain transition-opacity duration-500 lg:h-full lg:w-auto lg:max-h-full"
                   priority
                 />
               ) : (

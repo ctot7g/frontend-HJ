@@ -494,6 +494,32 @@ const handlePlaceOrder = async (installmentMeta?: {
         return;
       }
 
+      // use could not be checked then. This is the last checkpoint.
+if (appliedCoupon?.is_referral && !user) {
+  const guestEmail = formData.email?.trim().toLowerCase();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coupons/apply`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: appliedCoupon.code, guest_email: guestEmail }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast.error(data.message || "This referral code has already been used with this email");
+      setAppliedCoupon(null);
+      setCouponCode("");
+      setDiscountAmount(0);
+      setIsProcessingPayment(false);
+      return;
+    }
+  } catch (err) {
+    console.error("Guest referral re-validation failed:", err);
+    toast.error("Could not verify referral code, please try again");
+    setIsProcessingPayment(false);
+    return;
+  }
+}
+
       toast.loading("Processing your order...", { id: "payment-processing" });
 
       const totalDiscount = discountAmount + walletDiscount + referralDiscount;
