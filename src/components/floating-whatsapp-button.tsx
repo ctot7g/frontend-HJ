@@ -1,7 +1,23 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export function FloatingWhatsAppButton() {
+  const [whatsappHref, setWhatsappHref] = useState("https://wa.me/447306127481");
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    // Strip ref code so it's never leaked in the shared WhatsApp link
+    url.searchParams.delete("ref");
+
+    const cleanUrl = url.toString();
+    const message = `Hi, I'm interested in this product: ${cleanUrl}`;
+    setWhatsappHref(`https://wa.me/447306127481?text=${encodeURIComponent(message)}`);
+  }, []);
+
   return (
-    <a
-      href="https://wa.me/447306127481" // Replace with your WhatsApp number
+    
+    <a href={whatsappHref}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 shadow-lg transition-colors hover:bg-green-600"

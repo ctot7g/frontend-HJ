@@ -78,36 +78,36 @@ const ShopOurBestSeller = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { data: bestSellers = [], isLoading: isBestSellerLoading, error } = useBestSellerProducts();
   const {
-  data: infiniteData,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-} = useInfiniteProducts({
-  limit: 24,
-  includeVariants: true,
-  includeImages: true,
-});
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts({
+    limit: 24,
+    includeVariants: true,
+    includeImages: true,
+  });
 
   const regularProducts: BestSellerProductData[] =
   infiniteData?.pages.flatMap((page) => page.items) || [];
-const isLoading = isBestSellerLoading;
+  const isLoading = isBestSellerLoading;
 
 
   const scroll = (direction: "left" | "right") => {
-  if (!scrollRef.current) return;
-  scrollRef.current.scrollBy({
-    left: direction === "left" ? -390 : 390,
-    behavior: "smooth",
-  });
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -390 : 390,
+      behavior: "smooth",
+    });
 
-  if (direction === "right") {
-    const el = scrollRef.current;
-    const nearEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 800;
-    if (nearEnd && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    if (direction === "right") {
+      const el = scrollRef.current;
+      const nearEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 800;
+      if (nearEnd && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
     }
-  }
-};
+  };
 
 useEffect(() => {
   const el = scrollRef.current;
@@ -145,7 +145,7 @@ useEffect(() => {
       [...(product.images || [])]
         .sort((a: BestSellerImage, b: BestSellerImage) => (a.order || 0) - (b.order || 0))
         .find((img: BestSellerImage) => img.type === "main")?.url ||
-      product.images?.[0]?.url;
+        product.images?.[0]?.url;
 
     const productImage =
       mainImage?.startsWith("http") || mainImage?.startsWith("/")

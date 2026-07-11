@@ -27,18 +27,18 @@ const NewArrivals = () => {
   });
 
   const {
-  data: infiniteData,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-} = useInfiniteProducts({
-  limit: 24,
-  includeVariants: true,
-  includeImages: true,
-});
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts({
+    limit: 24,
+    includeVariants: true,
+    includeImages: true,
+  });
 
   const newArrivals = (data as FeaturedProduct[] | undefined) || [];
-const isLoading = isNewLoading;
+  const isLoading = isNewLoading;
 
   interface RegularProductItem {
     id: string;
@@ -78,7 +78,7 @@ const isLoading = isNewLoading;
   };
 
   const newArrivalIds = new Set(newArrivals.map((p) => p.id));
-const regularProducts: RegularProductItem[] =
+  const regularProducts: RegularProductItem[] =
   infiniteData?.pages.flatMap((page) => page.items) || [];
   const fallbackProducts = regularProducts
     .filter((p) => !newArrivalIds.has(p.id))
@@ -87,14 +87,14 @@ const regularProducts: RegularProductItem[] =
   const products: FeaturedProduct[] = [...newArrivals, ...fallbackProducts];
 
   const desktopScrollRef = useRef<HTMLDivElement>(null);
-const lgScrollRef = useRef<HTMLDivElement>(null);
+  const lgScrollRef = useRef<HTMLDivElement>(null);
 
-const maybeFetchNext = (el: HTMLDivElement) => {
-  const nearEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 800;
-  if (nearEnd && hasNextPage && !isFetchingNextPage) {
-    fetchNextPage();
-  }
-};
+  const maybeFetchNext = (el: HTMLDivElement) => {
+    const nearEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 800;
+    if (nearEnd && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
 const scrollDesktop = (direction: "left" | "right") => {
   if (!desktopScrollRef.current) return;
@@ -131,7 +131,7 @@ useEffect(() => {
 }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Helper function to process product
-const processProduct = (product: FeaturedProduct) => {
+  const processProduct = (product: FeaturedProduct) => {
     const basePrice = product.base_price || 0;
     const variantPrice = product.default_variant?.price || basePrice;
     const discount = Number((product as any).discount_offer) || 0;
@@ -188,9 +188,6 @@ const processProduct = (product: FeaturedProduct) => {
     );
   }
 
-  // Desktop helpers
-  // const getDesktopProducts = () => products.slice(0, 2);
-  // const getDesktopProductsLg = () => products.slice(0, 3);
 
   return (
     <div className="bg-light-blue py-10 md:py-16">
