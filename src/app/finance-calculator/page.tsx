@@ -185,8 +185,8 @@ export default function FinanceCalculatorModal({
             <b>Please note:</b> the finance calculator provides only a guide, and
             the exact amounts will be confirmed during the application process.
           </p>
-          <p className="mt-2 text-xs leading-relaxed text-gray-500">
-            <b>Disclaimer:</b> Aleena London t/a Sofa Deal is an Introducer Appointed Representative
+          <p className="mt-2 text-[12px] leading-relaxed font-bold tracking-tight text-gray-500">
+            Disclaimer: Aleena London t/a Sofa Deal is an Introducer Appointed Representative
             of Ideal Sales Solutions Ltd trading as Ideal4Finance. Ideal Sales
             Solutions Ltd is a credit broker and not a lender (FRN 703401). Finance
             options are arranged through a panel of lenders regulated in the UK.
